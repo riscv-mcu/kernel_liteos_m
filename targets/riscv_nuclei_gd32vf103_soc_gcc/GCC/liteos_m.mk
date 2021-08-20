@@ -16,10 +16,10 @@ C_INCLUDES    += -I$(LITEOSTOPDIR)/utils \
                  -I$(LITEOSTOPDIR)/components/power
 
 #third party related
-C_INCLUDES    += -I$(LITEOSTOPDIR)/../../third_party/bounds_checking_function/include \
-                 -I$(LITEOSTOPDIR)/../../third_party/bounds_checking_function/src
+C_INCLUDES    += -I$(LITEOSTOPDIR)/third_party/bounds_checking_function/include \
+                 -I$(LITEOSTOPDIR)/third_party/bounds_checking_function/src
 
-C_SOURCES     += $(wildcard $(LITEOSTOPDIR)/../../third_party/bounds_checking_function/src/*.c)
+C_SOURCES     += $(wildcard $(LITEOSTOPDIR)/third_party/bounds_checking_function/src/*.c)
 
 # NMSIS related
 C_INCLUDES    += -I$(LITEOSTOPDIR)/kernel/arch/risc-v/nuclei/gcc/nmsis/Core/Include \
