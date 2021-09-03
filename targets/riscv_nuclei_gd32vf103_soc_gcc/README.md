@@ -134,7 +134,7 @@ RV-STAR是一款基于GD32VF103 MCU的RISC-V评估开发板，提供了板载调
 
 ### 编译源码<a name="sectionb2"></a>
 
-使用`git clone`复制代码到任意目录下，打开进入到工程根目录下，输入`git submodule update --init --recursive`下载更新子模块。
+参见 [OpenHarmony源码获取](https://www.openharmony.cn/source_code/) 进行 **OpenHarmony主干代码获取**，然后进入到`kernel/liteos_m/`目录下。
 
 编译前请在当前控制台中配置`NUCLEI_TOOL_ROOT`路径，假设`Nuclei`文件夹所在路径为`/home/Nuclei`，输入`export NUCLEI_TOOL_ROOT=/home/Nuclei` 。或者使用时make选项增加`NUCLEI_TOOL_ROOT=/home/Nuclei`。
 
