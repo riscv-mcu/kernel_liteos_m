@@ -15,11 +15,15 @@ C_INCLUDES    += -I$(LITEOSTOPDIR)/utils \
                  -I$(LITEOSTOPDIR)/components/backtrace \
                  -I$(LITEOSTOPDIR)/components/power
 
-#third party related
-C_INCLUDES    += -I$(LITEOSTOPDIR)/../../third_party/bounds_checking_function/include \
-                 -I$(LITEOSTOPDIR)/../../third_party/bounds_checking_function/src
+# see https://gitee.com/openharmony/kernel_liteos_m/issues/I4LCBC
+# bounds_checking_function is not maintained here, but as workaround to make this Makefile
+# work simply, I just add this source code to components/bounds_checking_function folder
 
-C_SOURCES     += $(wildcard $(LITEOSTOPDIR)/../../third_party/bounds_checking_function/src/*.c)
+#third party related
+C_INCLUDES    += -I$(LITEOSTOPDIR)/components/bounds_checking_function/include \
+                 -I$(LITEOSTOPDIR)/components/bounds_checking_function/src
+
+C_SOURCES     += $(wildcard $(LITEOSTOPDIR)/components/bounds_checking_function/src/*.c)
 
 # NMSIS related
 C_INCLUDES    += -I$(LITEOSTOPDIR)/kernel/arch/risc-v/nuclei/gcc/nmsis/Core/Include \

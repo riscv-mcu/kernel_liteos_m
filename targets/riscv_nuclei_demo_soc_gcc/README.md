@@ -2,6 +2,10 @@
 
 ## Nuclei DDR200T开发板简介
 
+> [!NOTE]
+>
+> 这个是用来测试比较早的Nuclei Demosoc FPGA环境，现在已经升级到Nuclei Evalsoc，可能编译出来的版本不能直接在开发板上跑起来，需要比较老的bitstream。
+
 Nuclei DDR200T开发板是一款集成了FPGA和通用MCU的RISC-V评估开发板。其中FPGA子系统采用Xilinx XC7A200T-2 FPGA芯片，提供板载FPGA JTAG下载器、丰富的板载存储（Flash,DDR,eMMC,EEPROM)、丰富的接口资源（数字、模拟）以及蜂鸟调试器接口。MCU子系统采用GD32VF103 MCU芯片，提供板载调试器以及JTAG调试接口。
 
 开发板资料链接：
@@ -107,32 +111,32 @@ Nuclei DDR200T开发板是一款集成了FPGA和通用MCU的RISC-V评估开发�
    Bus 001 Device 010: ID 0403:6010 Future Technology Devices International, Ltd FT2232xxxx
    ```
 
-3. 将github（https://github.com/riscv-mcu/ses_nuclei_sdk_projects/blob/master/misc/99-openocd.rules）上misc文件夹内99-openocd.rules文件复制到当前路径下，控制台中输入sudo cp 99-openocd.rules /etc/udev/rules.d/99-openocd.rules指令复制文件到指定路径下。
+3. 将github https://github.com/riscv-mcu/ses_nuclei_sdk_projects/blob/master/misc/99-openocd.rules 上misc文件夹内 ``99-openocd.rules`` 文件复制到当前路径下，控制台中输入``sudo cp 99-openocd.rules /etc/udev/rules.d/99-openocd.rules`` 指令复制文件到指定路径下。
 
 4. 断开调试器再重新连接到Linux系统中。
 
-5. 使用ls /dev/ttyUSB*命令查看ttyUSB信息，参考输出如下：
+5. 使用``ls /dev/ttyUSB*``命令查看ttyUSB信息，参考输出如下：
 
    ```
    /dev/ttyUSB0 /dev/ttyUSB1
    ```
 
-6. 使用ls -l /dev/ttyUSB1命令查看分组信息，参考输出如下: 
+6. 使用``ls -l /dev/ttyUSB1``命令查看分组信息，参考输出如下: 
 
    ```
    crw-rw-r-- 1 root plugdev 188, 1 Nov 28 12:53 /dev/ttyUSB1
    ```
 
-   可以看到ttyUSB1已经加入plugdev组，接下来我们要将自己添加到plugdev组。使用whoami命令查看当前用户名，我们将其记录为\< your_user_name >。
+   可以看到ttyUSB1已经加入plugdev组，接下来我们要将自己添加到plugdev组。使用whoami命令查看当前用户名，我们将其记录为``<your_user_name>``。
 
-7. 使用sudo usermod -a -G plugdev \<your_user_name>命令将自己添加进plugdev组。
+7. 使用``sudo usermod -a -G plugdev <your_user_name>``命令将自己添加进plugdev组。
 
 8. 再次确认当前用户名已属于plugdev组，使用groups命令，可以看到打印信息中有plugdev即成功将当前用户添加至plugdev组。
 
 ### 编译源码<a name="sectionb2"></a>
 
-参见 [OpenHarmony源码获取](https://www.openharmony.cn/source_code/) 进行 **OpenHarmony主干代码获取**，然后进入到`kernel/liteos_m/`目录下。
-
+> 为了方便编译，我们将编译缺失的 securec.h 头文件及c代码 全部拷贝到了 ``components/bounds_checking_function`` 目录下，并修改了Makefile.
+> 这样通过make命令就可以直接构建了。
 
 编译前请在当前控制台中配置`NUCLEI_TOOL_ROOT`路径，假设`Nuclei`文件夹所在路径为`/home/Nuclei`，输入`export NUCLEI_TOOL_ROOT=/home/Nuclei` 。或者使用时make选项增加`NUCLEI_TOOL_ROOT=/home/Nuclei`。
 
