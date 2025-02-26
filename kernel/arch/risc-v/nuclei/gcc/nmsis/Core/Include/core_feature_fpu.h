@@ -32,6 +32,8 @@
  extern "C" {
 #endif
 
+#include "core_feature_base.h"
+
 /* ===== FPU Operations ===== */
 /**
  * \defgroup NMSIS_Core_FPU_Functions   FPU Functions
@@ -74,8 +76,10 @@
 /** \brief Set FFLAGS CSR Register with val */
 #define __set_FFLAGS(val)       __RV_CSR_WRITE(CSR_FFLAGS, (val))
 
-/** \brief Enable FPU Unit */
-#define __enable_FPU()          __RV_CSR_SET(CSR_MSTATUS, MSTATUS_FS)
+/** \brief Enable FPU Unit, and set state to initial */
+#define __enable_FPU()          { __RV_CSR_CLEAR(CSR_MSTATUS, MSTATUS_FS); \
+                                  __RV_CSR_SET(CSR_MSTATUS, MSTATUS_FS_INITIAL); \
+                                }
 /**
  * \brief Disable FPU Unit
  * \details
@@ -102,7 +106,7 @@
  */
 #define __RV_FLW(freg, addr, ofs)                              \
     ({                                                         \
-        register rv_csr_t __addr = (rv_csr_t)(addr);           \
+        rv_csr_t __addr = (rv_csr_t)(addr);                    \
         __ASM volatile("flw " STRINGIFY(freg) ", %0(%1)  "     \
                      : : "I"(ofs), "r"(__addr)                 \
                      : "memory");                              \
@@ -123,7 +127,7 @@
  */
 #define __RV_FSW(freg, addr, ofs)                              \
     ({                                                         \
-        register rv_csr_t __addr = (rv_csr_t)(addr);           \
+        rv_csr_t __addr = (rv_csr_t)(addr);                    \
         __ASM volatile("fsw " STRINGIFY(freg) ", %0(%1)  "     \
                      : : "I"(ofs), "r"(__addr)                 \
                      : "memory");                              \
@@ -146,7 +150,7 @@
  */
 #define __RV_FLD(freg, addr, ofs)                              \
     ({                                                         \
-        register rv_csr_t __addr = (rv_csr_t)(addr);           \
+        rv_csr_t __addr = (rv_csr_t)(addr);                    \
         __ASM volatile("fld " STRINGIFY(freg) ", %0(%1)  "     \
                      : : "I"(ofs), "r"(__addr)                 \
                      : "memory");                              \
@@ -169,7 +173,7 @@
  */
 #define __RV_FSD(freg, addr, ofs)                              \
     ({                                                         \
-        register rv_csr_t __addr = (rv_csr_t)(addr);           \
+        rv_csr_t __addr = (rv_csr_t)(addr);                    \
         __ASM volatile("fsd " STRINGIFY(freg) ", %0(%1)  "     \
                      : : "I"(ofs), "r"(__addr)                 \
                      : "memory");                              \
@@ -301,4 +305,4 @@ typedef uint64_t rv_fpu_t;
 #ifdef __cplusplus
 }
 #endif
-#endif /** __RISCV_EXT_FPU_H__  */
+#endif /* __CORE_FEATURE_FPU_H__ */

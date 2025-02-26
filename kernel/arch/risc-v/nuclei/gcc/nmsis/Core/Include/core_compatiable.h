@@ -25,6 +25,8 @@
  extern "C" {
 #endif
 
+#include "core_feature_base.h"
+
 /* ===== ARM Compatiable Functions ===== */
 /**
  * \defgroup NMSIS_Core_ARMCompatiable_Functions   ARM Compatiable Functions
@@ -139,7 +141,7 @@ __STATIC_FORCEINLINE uint32_t __REV16(uint32_t value)
 {
     uint32_t result;
     result =  ((value & 0xff000000) >> 8)
-        | ((value & 0x00ff00000) << 8 )
+        | ((value & 0x00ff0000) << 8 )
         | ((value & 0x0000ff00) >> 8 )
         | ((value & 0x000000ff) << 8) ;
 
@@ -176,6 +178,26 @@ __STATIC_FORCEINLINE uint32_t __ROR(uint32_t op1, uint32_t op2)
       return op1;
     }
     return (op1 >> op2) | (op1 << (32U - op2));
+}
+
+/**
+ * \brief   Rotate Right in uint32x2 value (64 bit)
+ * \details Rotate Right (immediate) provides the value of
+ * the contents of a register rotated by a variable number of bits.
+ * \param [in]    op1  Value to rotate([63:32] and [31:0] rotate separately)
+ * \param [in]    op2  Number of Bits to rotate
+ * \return        Rotated value([63:32] | [31:0])
+ */
+__STATIC_FORCEINLINE uint64_t __ROR64(uint64_t op1, uint32_t op2)
+{
+    op2 = op2 & 0x1F;
+    if (op2 == 0U) {
+      return op1;
+    }
+    uint32_t tmp1 = (uint32_t)op1;
+    uint32_t tmp2 = (uint32_t)(op1 >> 32);
+    return (uint64_t)((tmp1 >> op2) | (tmp1 << (32U - op2)))
+           | ((uint64_t)((tmp2 >> op2) | (tmp2 << (32U - op2))) << 32);
 }
 
 /**
@@ -223,6 +245,48 @@ __STATIC_FORCEINLINE uint8_t __CLZ(uint32_t data)
     return ret;
 }
 #endif /* defined(__DSP_PRESENT) && (__DSP_PRESENT == 1) */
+
+/**
+ * \brief   Count tailing zero
+ * \details Return the count of least-significant bit zero.for example, return 3 if x=0bxxx1000
+ * \param [in] data   Value to count the tailing zeros
+ * \return            number of tailing zeros in value
+ * \remark
+ * - The value mustn't be 0, or else it will spin here
+ */
+__STATIC_FORCEINLINE unsigned long __CTZ(unsigned long data)
+{
+    unsigned long ret = 0;
+
+    while (!(data & 1UL)) {
+        ret++;
+        data = data >> 1;
+    }
+
+    return ret;
+}
+
+/**
+ * \brief   Expand byte to unsigned long value
+ * \details Expand byte value x to unsigned long value's each byte.
+ * \param [in] x   the byte value to be expand, the input must be uint8_t type
+ * \return         Expanded value in unsigned long
+ */
+#if __RISCV_XLEN == 32
+#define __EXPD_BYTE(x)      ((unsigned long)(((unsigned long)(x) <<  0) | \
+                                    ((unsigned long)(x) <<  8) | \
+                                    ((unsigned long)(x) << 16) | \
+                                    ((unsigned long)(x) << 24)))
+#elif __RISCV_XLEN == 64
+#define __EXPD_BYTE(x)      ((unsigned long)(((unsigned long)(x) <<  0) | \
+                                    ((unsigned long)(x) <<  8) | \
+                                    ((unsigned long)(x) << 16) | \
+                                    ((unsigned long)(x) << 24) | \
+                                    ((unsigned long)(x) << 32) | \
+                                    ((unsigned long)(x) << 40) | \
+                                    ((unsigned long)(x) << 48) | \
+                                    ((unsigned long)(x) << 56)))
+#endif
 
 /** @} */ /* End of Doxygen Group NMSIS_Core_ARMCompatiable_Functions */
 

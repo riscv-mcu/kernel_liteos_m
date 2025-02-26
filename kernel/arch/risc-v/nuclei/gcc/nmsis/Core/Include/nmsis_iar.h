@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-#ifndef __NMSIS_GCC_H__
-#define __NMSIS_GCC_H__
+#ifndef __NMSIS_IAR_H__
+#define __NMSIS_IAR_H__
 /*!
- * @file     nmsis_gcc.h
- * @brief    NMSIS compiler GCC header file
+ * @file     nmsis_iar.h
+ * @brief    NMSIS compiler IAR header file
  */
 #include <stdint.h>
 
@@ -85,9 +85,9 @@
   #define __WEAK                                 __attribute__((weak))
 #endif
 
-/** \brief specified the vector size of the variable, measured in bytes */
+/** \brief specified the vector size of the variable, measured in bytes, not supported in IAR */
 #ifndef   __VECTOR_SIZE
-  #define __VECTOR_SIZE(x)                       __attribute__((vector_size(x)))
+  #define __VECTOR_SIZE(x)
 #endif
 
 /** \brief Request smallest possible alignment. */
@@ -106,53 +106,49 @@
 #endif
 
 #ifndef   __UNALIGNED_UINT16_WRITE
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wpacked"
-  #pragma GCC diagnostic ignored "-Wattributes"
+  #pragma language=save
+  #pragma language=extended
   /** \brief Packed struct for unaligned uint16_t write access */
   __PACKED_STRUCT T_UINT16_WRITE {
       uint16_t v;
   };
-  #pragma GCC diagnostic pop
+  #pragma language=restore
   /** \brief Pointer for unaligned write of a uint16_t variable. */
   #define __UNALIGNED_UINT16_WRITE(addr, val)    (void)((((struct T_UINT16_WRITE *)(void *)(addr))->v) = (val))
 #endif
 
 #ifndef   __UNALIGNED_UINT16_READ
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wpacked"
-  #pragma GCC diagnostic ignored "-Wattributes"
+  #pragma language=save
+  #pragma language=extended
   /** \brief Packed struct for unaligned uint16_t read access */
   __PACKED_STRUCT T_UINT16_READ {
       uint16_t v;
   };
-  #pragma GCC diagnostic pop
+  #pragma language=restore
   /** \brief Pointer for unaligned read of a uint16_t variable. */
   #define __UNALIGNED_UINT16_READ(addr)          (((const struct T_UINT16_READ *)(const void *)(addr))->v)
 #endif
 
 #ifndef   __UNALIGNED_UINT32_WRITE
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wpacked"
-  #pragma GCC diagnostic ignored "-Wattributes"
+  #pragma language=save
+  #pragma language=extended
   /** \brief Packed struct for unaligned uint32_t write access */
   __PACKED_STRUCT T_UINT32_WRITE {
       uint32_t v;
   };
-  #pragma GCC diagnostic pop
+  #pragma language=restore
   /** \brief Pointer for unaligned write of a uint32_t variable. */
   #define __UNALIGNED_UINT32_WRITE(addr, val)    (void)((((struct T_UINT32_WRITE *)(void *)(addr))->v) = (val))
 #endif
 
 #ifndef   __UNALIGNED_UINT32_READ
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wpacked"
-  #pragma GCC diagnostic ignored "-Wattributes"
+  #pragma language=save
+  #pragma language=extended
   /** \brief Packed struct for unaligned uint32_t read access */
   __PACKED_STRUCT T_UINT32_READ {
       uint32_t v;
   };
-  #pragma GCC diagnostic pop
+  #pragma language=restore
   /** \brief Pointer for unaligned read of a uint32_t variable. */
   #define __UNALIGNED_UINT32_READ(addr)          (((const struct T_UINT32_READ *)(const void *)(addr))->v)
 #endif
@@ -174,32 +170,32 @@
 
 /** \brief provide the compiler with branch prediction information, the branch is usually true */
 #ifndef   __USUALLY
-  #define __USUALLY(exp)                         __builtin_expect((exp), 1)
+  #define __USUALLY(exp)                         (exp)
 #endif
 
 /** \brief provide the compiler with branch prediction information, the branch is rarely true */
 #ifndef   __RARELY
-  #define __RARELY(exp)                          __builtin_expect((exp), 0)
+  #define __RARELY(exp)                          (exp)
 #endif
 
 /** \brief Use this attribute to indicate that the specified function is an interrupt handler run in Machine Mode. */
 #ifndef   __INTERRUPT
-  #define __INTERRUPT                            __attribute__((interrupt))
+  #define __INTERRUPT                            __machine __interrupt
 #endif
 
 /** \brief Use this attribute to indicate that the specified function is an interrupt handler run in Machine Mode. */
 #ifndef   __MACHINE_INTERRUPT
-  #define __MACHINE_INTERRUPT                    __attribute__ ((interrupt ("machine")))
+  #define __MACHINE_INTERRUPT                    __machine __interrupt
 #endif
 
 /** \brief Use this attribute to indicate that the specified function is an interrupt handler run in Supervisor Mode. */
 #ifndef   __SUPERVISOR_INTERRUPT
-  #define __SUPERVISOR_INTERRUPT                 __attribute__ ((interrupt ("supervisor")))
+  #define __SUPERVISOR_INTERRUPT                 __supervisor __interrupt
 #endif
 
 /** \brief Use this attribute to indicate that the specified function is an interrupt handler run in User Mode. */
 #ifndef   __USER_INTERRUPT
-  #define __USER_INTERRUPT                       __attribute__ ((interrupt ("user")))
+  #define __USER_INTERRUPT                       __user __interrupt
 #endif
 
 /** @} */ /* End of Doxygen Group NMSIS_Core_CompilerControl */

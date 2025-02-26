@@ -38,6 +38,7 @@
 
 #define REGBYTES (1 << LOG_REGBYTES)
 
+#if defined(__riscv_flen)
 #if __riscv_flen == 64
 # define FPSTORE                fsd
 # define FPLOAD                 fld
@@ -46,18 +47,24 @@
 # define FPSTORE                fsw
 # define FPLOAD                 flw
 # define LOG_FPREGBYTES         2
-#endif /* __riscv_flen */
+#endif /* __riscv_flen == 64 */
 #define FPREGBYTES              (1 << LOG_FPREGBYTES)
+#endif /* __riscv_flen */
 
+#ifdef __GNUC__
 #define __rv_likely(x)          __builtin_expect((x), 1)
 #define __rv_unlikely(x)        __builtin_expect((x), 0)
+#else
+#define __rv_likely(x)          (x)
+#define __rv_unlikely(x)        (x)
+#endif
 
 #define __RV_ROUNDUP(a, b)      ((((a)-1)/(b)+1)*(b))
 #define __RV_ROUNDDOWN(a, b)    ((a)/(b)*(b))
 
 #define __RV_MAX(a, b)          ((a) > (b) ? (a) : (b))
 #define __RV_MIN(a, b)          ((a) < (b) ? (a) : (b))
-#define __RV_CLAMP(a, lo, hi)   MIN(MAX(a, lo), hi)
+#define __RV_CLAMP(a, lo, hi)   __RV_MIN(__RV_MAX(a, lo), hi)
 
 #define __RV_EXTRACT_FIELD(val, which)                  (((val) & (which)) / ((which) & ~((which)-1)))
 #define __RV_INSERT_FIELD(val, which, fieldval)         (((val) & ~(which)) | ((fieldval) * ((which) & ~((which)-1))))
@@ -89,4 +96,4 @@
 }
 #endif
 
-#endif /** __RISCV_BITS_H__  */
+#endif /* __RISCV_BITS_H__ */

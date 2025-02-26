@@ -27,14 +27,19 @@
  *   * 0: Not present
  *   * 1: Present
  * 2. __ECLIC_BASEADDR:  Base address of the ECLIC unit.
- * 3. ECLIC_GetInfoCtlbits():  Define the number of hardware bits are actually implemented in the clicintctl registers.
+ * 3. __ECLIC_INTCTLBITS:  Optional, if defined, it should set to the value of ECLIC_GetInfoCtlbits(), define the number of hardware bits are actually implemented in the clicintctl registers.
  *   Valid number is 1 - 8.
- * 4. __ECLIC_INTNUM  : Define the external interrupt number of ECLIC Unit
+ * 4. __ECLIC_INTNUM:  Define the external interrupt number of ECLIC Unit
+ * 5. __TEE_PRESENT:  Define whether TEE feature present, if present, ECLIC will present with S-Mode ECLIC feature
+ *   * 0: Not present
+ *   * 1: Present
  *
  */
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+#include "core_feature_base.h"
 
 #if defined(__ECLIC_PRESENT) && (__ECLIC_PRESENT == 1)
 /**
@@ -51,12 +56,12 @@
 typedef union
 {
     struct {
-        uint8_t _reserved0:1;                   /*!< bit:     0   Overflow condition code flag */
-        uint8_t nlbits:4;                       /*!< bit:     29  Carry condition code flag */
-        uint8_t _reserved1:2;                   /*!< bit:     30  Zero condition code flag */
-        uint8_t _reserved2:1;                   /*!< bit:     31  Negative condition code flag */
-    } b;                                        /*!< Structure used for bit  access */
-    uint8_t w;                                  /*!< Type      used for byte access */
+        __IM uint8_t _reserved0:1;
+        __IOM uint8_t nlbits:4;                /*!< bit:     1..4 specified the bit-width of level and priority in the register clicintctl[i] */
+        __IM uint8_t nmbits:2;                 /*!< bit:     5..6 ties to 1 if supervisor-level interrupt supported, or else it's reserved */
+        __IM uint8_t _reserved1:1;
+    } b;                                       /*!< Structure used for bit  access */
+    uint8_t w;                                 /*!< Type      used for byte access */
 } CLICCFG_Type;
 
 /**
@@ -64,51 +69,76 @@ typedef union
  */
 typedef union {
     struct {
-        uint32_t numint:13;                     /*!< bit:  0..12   number of maximum interrupt inputs supported */
-        uint32_t version:8;                     /*!< bit:  13..20  20:17 for architecture version,16:13 for implementation version */
-        uint32_t intctlbits:4;                  /*!< bit:  21..24  specifies how many hardware bits are actually implemented in the clicintctl registers */
-        uint32_t _reserved0:7;                  /*!< bit:  25..31  Reserved */
-    } b;                                        /*!< Structure used for bit  access */
-    uint32_t w;                                 /*!< Type      used for word access */
+        __IM uint32_t numint:13;               /*!< bit:  0..12   number of maximum interrupt inputs supported */
+        __IM uint32_t version:8;               /*!< bit:  13..20  20:17 for architecture version,16:13 for implementation version */
+        __IM uint32_t intctlbits:4;            /*!< bit:  21..24  specifies how many hardware bits are actually implemented in the clicintctl registers */
+        __IM uint32_t _reserved0:7;            /*!< bit:  25..31  Reserved */
+    } b;                                       /*!< Structure used for bit  access */
+    __IM uint32_t w;                           /*!< Type      used for word access */
 } CLICINFO_Type;
 
 /**
- * \brief Access to the structure of a vector interrupt controller.
+ * \brief Access to the machine mode register structure of INTIP, INTIE, INTATTR, INTCTL.
  */
 typedef struct {
-    __IOM uint8_t  INTIP;                       /*!< Offset: 0x000 (R/W)  Interrupt set pending register */
-    __IOM uint8_t  INTIE;                       /*!< Offset: 0x001 (R/W)  Interrupt set enable register */
-    __IOM uint8_t  INTATTR;                     /*!< Offset: 0x002 (R/W)  Interrupt set attributes register */
-    __IOM uint8_t  INTCTRL;                     /*!< Offset: 0x003 (R/W)  Interrupt configure register */
+    __IOM uint8_t INTIP;                       /*!< Offset: 0x000 (R/W)  Interrupt set pending register */
+    __IOM uint8_t INTIE;                       /*!< Offset: 0x001 (R/W)  Interrupt set enable register */
+    __IOM uint8_t INTATTR;                     /*!< Offset: 0x002 (R/W)  Interrupt set attributes register */
+    __IOM uint8_t INTCTRL;                     /*!< Offset: 0x003 (R/W)  Interrupt configure register */
 } CLIC_CTRL_Type;
 
+/**
+ * \brief Access to the structure of ECLIC Memory Map, which is compatible with TEE.
+ */
 typedef struct {
-    __IOM uint8_t   CFG;                        /*!< Offset: 0x000 (R/W)  CLIC configuration register */
-    uint8_t RESERVED0[3];
-    __IM uint32_t  INFO;                        /*!< Offset: 0x004 (R/ )  CLIC information register */
-    uint8_t RESERVED1[3];
-    __IOM uint8_t  MTH;                         /*!< Offset: 0x00B (R/W)  CLIC machine mode threshold register */
-    uint32_t RESERVED2[0x3FD];
-    CLIC_CTRL_Type CTRL[4096];                  /*!< Offset: 0x1000 (R/W) CLIC register structure for INTIP, INTIE, INTATTR, INTCTL */
+    __IOM uint8_t CFG;                         /*!< Offset: 0x000 (R/W)  CLIC configuration register */
+    __IM uint8_t RESERVED0[3];
+    __IM uint32_t INFO;                        /*!< Offset: 0x004 (R/ )  CLIC information register */
+    __IM uint8_t RESERVED1;
+#if defined(__TEE_PRESENT) && (__TEE_PRESENT == 1)
+    __IOM uint8_t STH;                         /*!<  Offset: 0x009 (R/W )  CLIC supervisor mode interrupt-level threshold */
+#else
+    __IM uint8_t RESERVED2;
+#endif
+    __IM uint8_t RESERVED3;
+    __IOM uint8_t MTH;                         /*!< Offset: 0x00B(R/W)  CLIC machine mode interrupt-level threshold */
+    uint32_t RESERVED4[1021];
+#if defined(__TEE_PRESENT) && (__TEE_PRESENT == 1)
+    CLIC_CTRL_Type CTRL[1024];                 /*!< Offset: 0x1000 (R/W) CLIC machine mode register structure for INTIP, INTIE, INTATTR, INTCTL */
+    __IM uint32_t RESERVED5[2];
+    __IM uint8_t RESERVED6;
+    __IOM uint8_t SSTH;                        /*!< Offset: 0x2009 (R)  CLIC supervisor mode threshold register, which is a mirror to mintthresh.sth */
+    __IM uint8_t RESERVED7;
+    __IM uint8_t RESERVED8;
+    __IM uint32_t RESERVED9[1021];
+    CLIC_CTRL_Type SCTRL[1024];                /*!< Offset: 0x3000 (R/W) CLIC supervisor mode register structure for INTIP, INTIE, INTATTR, INTCTL */
+#else
+    CLIC_CTRL_Type CTRL[4096];                 /*!< Offset: 0x1000 (R/W) CLIC machine mode register structure for INTIP, INTIE, INTATTR, INTCTL */
+#endif
 } CLIC_Type;
 
 #define CLIC_CLICCFG_NLBIT_Pos                 1U                                       /*!< CLIC CLICCFG: NLBIT Position */
 #define CLIC_CLICCFG_NLBIT_Msk                 (0xFUL << CLIC_CLICCFG_NLBIT_Pos)        /*!< CLIC CLICCFG: NLBIT Mask */
 
-#define CLIC_CLICINFO_CTLBIT_Pos                21U                                     /*!< CLIC INTINFO: __ECLIC_GetInfoCtlbits() Position */
-#define CLIC_CLICINFO_CTLBIT_Msk                (0xFUL << CLIC_CLICINFO_CTLBIT_Pos)     /*!< CLIC INTINFO: __ECLIC_GetInfoCtlbits() Mask */
+#define CLIC_CLICINFO_CTLBIT_Pos               21U                                      /*!< CLIC INTINFO: CLICINTCTLBITS Position */
+#define CLIC_CLICINFO_CTLBIT_Msk               (0xFUL << CLIC_CLICINFO_CTLBIT_Pos)      /*!< CLIC INTINFO: CLICINTCTLBITS Mask */
 
 #define CLIC_CLICINFO_VER_Pos                  13U                                      /*!< CLIC CLICINFO: VERSION Position */
-#define CLIC_CLICINFO_VER_Msk                  (0xFFUL << CLIC_CLICCFG_NLBIT_Pos)       /*!< CLIC CLICINFO: VERSION Mask */
+#define CLIC_CLICINFO_VER_Msk                  (0xFFUL << CLIC_CLICINFO_VER_Pos)        /*!< CLIC CLICINFO: VERSION Mask */
 
 #define CLIC_CLICINFO_NUM_Pos                  0U                                       /*!< CLIC CLICINFO: NUM Position */
-#define CLIC_CLICINFO_NUM_Msk                  (0xFFFUL << CLIC_CLICINFO_NUM_Pos)       /*!< CLIC CLICINFO: NUM Mask */
+#define CLIC_CLICINFO_NUM_Msk                  (0x1FFFUL << CLIC_CLICINFO_NUM_Pos)      /*!< CLIC CLICINFO: NUM Mask */
 
 #define CLIC_INTIP_IP_Pos                      0U                                       /*!< CLIC INTIP: IP Position */
 #define CLIC_INTIP_IP_Msk                      (0x1UL << CLIC_INTIP_IP_Pos)             /*!< CLIC INTIP: IP Mask */
 
 #define CLIC_INTIE_IE_Pos                      0U                                       /*!< CLIC INTIE: IE Position */
 #define CLIC_INTIE_IE_Msk                      (0x1UL << CLIC_INTIE_IE_Pos)             /*!< CLIC INTIE: IE Mask */
+
+#if defined(__TEE_PRESENT) && (__TEE_PRESENT == 1)
+#define CLIC_INTATTR_MODE_Pos                  6U                                       /*!< CLIC INTATTA: Mode Position */
+#define CLIC_INTATTR_MODE_Msk                  (0x3U << CLIC_INTATTR_MODE_Pos)          /*!< CLIC INTATTA: Mode Mask */
+#endif
 
 #define CLIC_INTATTR_TRIG_Pos                  1U                                       /*!< CLIC INTATTR: TRIG Position */
 #define CLIC_INTATTR_TRIG_Msk                  (0x3UL << CLIC_INTATTR_TRIG_Pos)         /*!< CLIC INTATTR: TRIG Mask */
@@ -125,8 +155,8 @@ typedef struct {
 /**\brief ECLIC Trigger Enum for different Trigger Type */
 typedef enum ECLIC_TRIGGER {
     ECLIC_LEVEL_TRIGGER = 0x0,          /*!< Level Triggerred, trig[0] = 0 */
-    ECLIC_POSTIVE_EDGE_TRIGGER = 0x1,   /*!< Postive/Rising Edge Triggered, trig[1] = 0, trig[0] = 1 */
-    ECLIC_NEGTIVE_EDGE_TRIGGER = 0x3,   /*!< Negtive/Falling Edge Triggered, trig[1] = 1, trig[0] = 0 */
+    ECLIC_POSTIVE_EDGE_TRIGGER = 0x1,   /*!< Postive/Rising Edge Triggered, trig[0] = 1, trig[1] = 0 */
+    ECLIC_NEGTIVE_EDGE_TRIGGER = 0x3,   /*!< Negtive/Falling Edge Triggered, trig[0] = 1, trig[1] = 1 */
     ECLIC_MAX_TRIGGER = 0x3             /*!< MAX Supported Trigger Mode */
 } ECLIC_TRIGGER_Type;
 
@@ -233,6 +263,26 @@ typedef enum IRQn {
     #define ECLIC_SetPriorityIRQ          __ECLIC_SetPriorityIRQ
     #define ECLIC_GetPriorityIRQ          __ECLIC_GetPriorityIRQ
 
+    /* For TEE */
+#if defined(__TEE_PRESENT) && (__TEE_PRESENT == 1)
+    #define ECLIC_SetModeIRQ              __ECLIC_SetModeIRQ
+    #define ECLIC_SetSth                  __ECLIC_SetSth
+    #define ECLIC_GetSth                  __ECLIC_GetSth
+    #define ECLIC_SetTrigIRQ_S            __ECLIC_SetTrigIRQ_S
+    #define ECLIC_GetTrigIRQ_S            __ECLIC_GetTrigIRQ_S
+    #define ECLIC_SetShvIRQ_S             __ECLIC_SetShvIRQ_S
+    #define ECLIC_GetShvIRQ_S             __ECLIC_GetShvIRQ_S
+    #define ECLIC_SetCtrlIRQ_S            __ECLIC_SetCtrlIRQ_S
+    #define ECLIC_GetCtrlIRQ_S            __ECLIC_GetCtrlIRQ_S
+    #define ECLIC_SetLevelIRQ_S           __ECLIC_SetLevelIRQ_S
+    #define ECLIC_GetLevelIRQ_S           __ECLIC_GetLevelIRQ_S
+    #define ECLIC_SetPriorityIRQ_S        __ECLIC_SetPriorityIRQ_S
+    #define ECLIC_GetPriorityIRQ_S        __ECLIC_GetPriorityIRQ_S
+    #define ECLIC_EnableIRQ_S             __ECLIC_EnableIRQ_S
+    #define ECLIC_GetEnableIRQ_S          __ECLIC_GetEnableIRQ_S
+    #define ECLIC_DisableIRQ_S            __ECLIC_DisableIRQ_S
+
+#endif
 #endif /* NMSIS_ECLIC_VIRTUAL */
 
 #ifdef NMSIS_VECTAB_VIRTUAL
@@ -243,6 +293,11 @@ typedef enum IRQn {
 #else
     #define ECLIC_SetVector              __ECLIC_SetVector
     #define ECLIC_GetVector              __ECLIC_GetVector
+
+#if defined(__TEE_PRESENT) && (__TEE_PRESENT == 1)
+    #define ECLIC_SetVector_S            __ECLIC_SetVector_S
+    #define ECLIC_GetVector_S            __ECLIC_GetVector_S
+#endif
 #endif  /* (NMSIS_VECTAB_VIRTUAL) */
 
 /**
@@ -257,8 +312,10 @@ typedef enum IRQn {
  */
 __STATIC_FORCEINLINE void __ECLIC_SetCfgNlbits(uint32_t nlbits)
 {
-    ECLIC->CFG &= ~CLIC_CLICCFG_NLBIT_Msk;
-    ECLIC->CFG |= (uint8_t)((nlbits <<CLIC_CLICCFG_NLBIT_Pos) & CLIC_CLICCFG_NLBIT_Msk);
+    uint8_t temp = ECLIC->CFG;
+
+    ECLIC->CFG = (temp & ~CLIC_CLICCFG_NLBIT_Msk) | \
+                 ((uint8_t)((nlbits << CLIC_CLICCFG_NLBIT_Pos) & CLIC_CLICCFG_NLBIT_Msk));
 }
 
 /**
@@ -383,7 +440,7 @@ __STATIC_FORCEINLINE void __ECLIC_EnableIRQ(IRQn_Type IRQn)
  */
 __STATIC_FORCEINLINE uint32_t __ECLIC_GetEnableIRQ(IRQn_Type IRQn)
 {
-    return((uint32_t) (ECLIC->CTRL[IRQn].INTIE) & CLIC_INTIE_IE_Msk);
+    return ((uint32_t) (ECLIC->CTRL[IRQn].INTIE) & CLIC_INTIE_IE_Msk);
 }
 
 /**
@@ -417,7 +474,7 @@ __STATIC_FORCEINLINE void __ECLIC_DisableIRQ(IRQn_Type IRQn)
  */
 __STATIC_FORCEINLINE int32_t __ECLIC_GetPendingIRQ(IRQn_Type IRQn)
 {
-    return((uint32_t)(ECLIC->CTRL[IRQn].INTIP) & CLIC_INTIP_IP_Msk);
+    return ((uint32_t)(ECLIC->CTRL[IRQn].INTIP) & CLIC_INTIP_IP_Msk);
 }
 
 /**
@@ -450,7 +507,7 @@ __STATIC_FORCEINLINE void __ECLIC_SetPendingIRQ(IRQn_Type IRQn)
  */
 __STATIC_FORCEINLINE void __ECLIC_ClearPendingIRQ(IRQn_Type IRQn)
 {
-    ECLIC->CTRL[IRQn].INTIP &= ~ CLIC_INTIP_IP_Msk;
+    ECLIC->CTRL[IRQn].INTIP &= ~CLIC_INTIP_IP_Msk;
 }
 
 /**
@@ -471,8 +528,10 @@ __STATIC_FORCEINLINE void __ECLIC_ClearPendingIRQ(IRQn_Type IRQn)
  */
 __STATIC_FORCEINLINE void __ECLIC_SetTrigIRQ(IRQn_Type IRQn, uint32_t trig)
 {
-    ECLIC->CTRL[IRQn].INTATTR &= ~CLIC_INTATTR_TRIG_Msk;
-    ECLIC->CTRL[IRQn].INTATTR |= (uint8_t)(trig<<CLIC_INTATTR_TRIG_Pos);
+    uint8_t temp = ECLIC->CTRL[IRQn].INTATTR;
+
+    ECLIC->CTRL[IRQn].INTATTR = (temp & ~CLIC_INTATTR_TRIG_Msk) | \
+                                ((uint8_t)(trig << CLIC_INTATTR_TRIG_Pos));
 }
 
 /**
@@ -492,7 +551,7 @@ __STATIC_FORCEINLINE void __ECLIC_SetTrigIRQ(IRQn_Type IRQn, uint32_t trig)
  */
 __STATIC_FORCEINLINE uint32_t __ECLIC_GetTrigIRQ(IRQn_Type IRQn)
 {
-    return ((int32_t)(((ECLIC->CTRL[IRQn].INTATTR) & CLIC_INTATTR_TRIG_Msk)>>CLIC_INTATTR_TRIG_Pos));
+    return ((uint32_t)(((ECLIC->CTRL[IRQn].INTATTR) & CLIC_INTATTR_TRIG_Msk) >> CLIC_INTATTR_TRIG_Pos));
 }
 
 /**
@@ -510,8 +569,10 @@ __STATIC_FORCEINLINE uint32_t __ECLIC_GetTrigIRQ(IRQn_Type IRQn)
  */
 __STATIC_FORCEINLINE void __ECLIC_SetShvIRQ(IRQn_Type IRQn, uint32_t shv)
 {
-    ECLIC->CTRL[IRQn].INTATTR &= ~CLIC_INTATTR_SHV_Msk;
-    ECLIC->CTRL[IRQn].INTATTR |= (uint8_t)(shv<<CLIC_INTATTR_SHV_Pos);
+    uint8_t temp = ECLIC->CTRL[IRQn].INTATTR;
+
+    ECLIC->CTRL[IRQn].INTATTR = (temp & ~CLIC_INTATTR_SHV_Msk) | \
+                                ((uint8_t)(shv << CLIC_INTATTR_SHV_Pos));
 }
 
 /**
@@ -529,7 +590,7 @@ __STATIC_FORCEINLINE void __ECLIC_SetShvIRQ(IRQn_Type IRQn, uint32_t shv)
  */
 __STATIC_FORCEINLINE uint32_t __ECLIC_GetShvIRQ(IRQn_Type IRQn)
 {
-    return ((int32_t)(((ECLIC->CTRL[IRQn].INTATTR) & CLIC_INTATTR_SHV_Msk)>>CLIC_INTATTR_SHV_Pos));
+    return ((uint32_t)(((ECLIC->CTRL[IRQn].INTATTR) & CLIC_INTATTR_SHV_Msk) >> CLIC_INTATTR_SHV_Pos));
 }
 
 /**
@@ -707,18 +768,21 @@ __STATIC_FORCEINLINE uint8_t __ECLIC_GetPriorityIRQ(IRQn_Type IRQn)
  */
 __STATIC_FORCEINLINE void __ECLIC_SetVector(IRQn_Type IRQn, rv_csr_t vector)
 {
-#if __RISCV_XLEN == 32
-    volatile uint32_t vec_base;
-    vec_base = ((uint32_t)__RV_CSR_READ(CSR_MTVT));
-    (* (unsigned long *) (vec_base + ((int32_t)IRQn) * 4)) = vector;
-#elif __RISCV_XLEN == 64
-    volatile uint64_t vec_base;
-    vec_base = ((uint64_t)__RV_CSR_READ(CSR_MTVT));
-    (* (unsigned long *) (vec_base + ((int32_t)IRQn) * 8)) = vector;
-#else // TODO Need cover for XLEN=128 case in future
-    volatile uint64_t vec_base;
-    vec_base = ((uint64_t)__RV_CSR_READ(CSR_MTVT));
-    (* (unsigned long *) (vec_base + ((int32_t)IRQn) * 8)) = vector;
+    volatile unsigned long vec_base;
+    vec_base = ((unsigned long)__RV_CSR_READ(CSR_MTVT));
+    vec_base += ((unsigned long)IRQn) * sizeof(unsigned long);
+    (* (unsigned long *) vec_base) = vector;
+#if (defined(__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1))
+#if (defined(__CCM_PRESENT) && (__CCM_PRESENT == 1))
+    MFlushDCacheLine((unsigned long)vec_base);
+#endif
+#endif
+#if (defined(__ICACHE_PRESENT) && (__ICACHE_PRESENT == 1))
+#if (defined(__CCM_PRESENT) && (__CCM_PRESENT == 1))
+    MInvalICacheLine((unsigned long)vec_base);
+#else
+    __FENCE_I();
+#endif
 #endif
 }
 
@@ -737,13 +801,422 @@ __STATIC_FORCEINLINE void __ECLIC_SetVector(IRQn_Type IRQn, rv_csr_t vector)
 __STATIC_FORCEINLINE rv_csr_t __ECLIC_GetVector(IRQn_Type IRQn)
 {
 #if __RISCV_XLEN == 32
-    return (*(uint32_t *)(__RV_CSR_READ(CSR_MTVT)+IRQn*4));
+    return (*(uint32_t *)(__RV_CSR_READ(CSR_MTVT) + IRQn * 4));
 #elif __RISCV_XLEN == 64
-    return (*(uint64_t *)(__RV_CSR_READ(CSR_MTVT)+IRQn*8));
+    return (*(uint64_t *)(__RV_CSR_READ(CSR_MTVT) + IRQn * 8));
 #else // TODO Need cover for XLEN=128 case in future
-    return (*(uint64_t *)(__RV_CSR_READ(CSR_MTVT)+IRQn*8));
+    return (*(uint64_t *)(__RV_CSR_READ(CSR_MTVT) + IRQn * 8));
 #endif
 }
+
+#if defined(__TEE_PRESENT) && (__TEE_PRESENT == 1)
+/**
+ * \brief  Set privilege mode of a specific interrupt
+ * \details
+ * This function set in which privilege mode the interrupts \em IRQn should be taken.
+ * \param [in]      IRQn  Interrupt number
+ * \param [in]      mode   Privilege mode
+ * \remarks
+ * - IRQn must not be negative.
+ * - mode must be 1(Supervisor Mode) or 3(Machine Mode), other values are ignored.
+ * - M-mode can R/W this field, but S-mode can only read.And ECLIC with TEE does not
+ *   reply on CSR mideleg to delegate interrupts.
+ * - Mode of S-mode ECLIC region's clicintattr can be omitted to set, which is mirror to M-mode ECLIC region's.
+ *   Only the low 6 bits of clicintattr [i] can be written via the S-mode memory region.
+ */
+__STATIC_FORCEINLINE void __ECLIC_SetModeIRQ(IRQn_Type IRQn, uint32_t mode)
+{
+    /*
+     * only 1 or 3 can be assigned to mode in one step.the default value of mode is 3,
+     * which can't be clear to 0 firstly, then OR it to 1
+     */
+    ECLIC->CTRL[IRQn].INTATTR = (uint8_t)(mode << CLIC_INTATTR_MODE_Pos) + \
+        (ECLIC->SCTRL[IRQn].INTATTR & (~CLIC_INTATTR_MODE_Msk));
+}
+
+/**
+ * \brief  Set supervisor-mode Interrupt Level Threshold in supervisor mode
+ * \details
+ * This function sets supervisor-mode interrupt level threshold.
+ * \param [in]  sth       Interrupt Level Threshold.
+ * \remarks
+ * - S-mode ECLIC region sintthresh'sth is a mirror to M-mode ECLIC region's mintthresh.sth,
+ *   and will be updated synchronously, here operate on mintthresh.sth.
+ * \sa
+ * - \ref ECLIC_GetSth
+ */
+__STATIC_FORCEINLINE void __ECLIC_SetSth(uint8_t sth)
+{
+    ECLIC->STH = sth;
+}
+
+/**
+ * \brief  Get supervisor-mode Interrupt Level Threshold in supervisor mode
+ * \details
+ * This function gets supervisor mode interrupt level threshold.
+ * \return       Interrupt Level Threshold.
+ * \remarks
+ * - S-mode ECLIC region sintthresh'sth is a mirror to M-mode ECLIC region's mintthresh.sth,
+ *   and will be updated synchronously, here operate on mintthresh.sth.
+ * \sa
+ * - \ref ECLIC_SetSth
+ */
+__STATIC_FORCEINLINE uint8_t __ECLIC_GetSth(void)
+{
+    return (ECLIC->STH);
+}
+
+/**
+ * \brief  Set trigger mode and polarity for a specific interrupt in supervisor mode
+ * \details
+ * This function set trigger mode and polarity of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \param [in]      trig
+ *                   - 00  level trigger, \ref ECLIC_LEVEL_TRIGGER
+ *                   - 01  positive edge trigger, \ref ECLIC_POSTIVE_EDGE_TRIGGER
+ *                   - 02  level trigger, \ref ECLIC_LEVEL_TRIGGER
+ *                   - 03  negative edge trigger, \ref ECLIC_NEGTIVE_EDGE_TRIGGER
+ * \remarks
+ * - IRQn must not be negative.
+ *
+ * \sa
+ * - \ref ECLIC_GetTrigIRQ_S
+ */
+__STATIC_FORCEINLINE void __ECLIC_SetTrigIRQ_S(IRQn_Type IRQn, uint32_t trig)
+{
+    uint8_t temp = ECLIC->SCTRL[IRQn].INTATTR;
+
+    ECLIC->SCTRL[IRQn].INTATTR = (temp & ~CLIC_INTATTR_TRIG_Msk) | \
+                                 ((uint8_t)(trig << CLIC_INTATTR_TRIG_Pos));
+}
+
+/**
+ * \brief  Get trigger mode and polarity for a specific interrupt in supervisor mode
+ * \details
+ * This function get trigger mode and polarity of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \return
+ *                 - 00  level trigger, \ref ECLIC_LEVEL_TRIGGER
+ *                 - 01  positive edge trigger, \ref ECLIC_POSTIVE_EDGE_TRIGGER
+ *                 - 02  level trigger, \ref ECLIC_LEVEL_TRIGGER
+ *                 - 03  negative edge trigger, \ref ECLIC_NEGTIVE_EDGE_TRIGGER
+ * \remarks
+ *     - IRQn must not be negative.
+ * \sa
+ *     - \ref ECLIC_SetTrigIRQ_S
+ */
+__STATIC_FORCEINLINE uint8_t __ECLIC_GetTrigIRQ_S(IRQn_Type IRQn)
+{
+    return ((uint8_t)(((ECLIC->SCTRL[IRQn].INTATTR) & CLIC_INTATTR_TRIG_Msk) >> CLIC_INTATTR_TRIG_Pos));
+}
+
+
+/**
+ * \brief  Set interrupt working mode for a specific interrupt in supervisor mode
+ * \details
+ * This function set selective hardware vector or non-vector working mode of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \param [in]      shv
+ *                        - 0  non-vector mode, \ref ECLIC_NON_VECTOR_INTERRUPT
+ *                        - 1  vector mode, \ref ECLIC_VECTOR_INTERRUPT
+ * \remarks
+ * - IRQn must not be negative.
+ * \sa
+ * - \ref ECLIC_GetShvIRQ_S
+ */
+__STATIC_FORCEINLINE void __ECLIC_SetShvIRQ_S(IRQn_Type IRQn, uint32_t shv)
+{
+    uint8_t temp = ECLIC->SCTRL[IRQn].INTATTR;
+
+    ECLIC->SCTRL[IRQn].INTATTR = (temp & ~CLIC_INTATTR_SHV_Msk) | \
+                                 ((uint8_t)(shv << CLIC_INTATTR_SHV_Pos));
+}
+
+/**
+ * \brief  Get interrupt working mode for a specific interrupt in supervisor mode
+ * \details
+ * This function get selective hardware vector or non-vector working mode of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \return       shv
+ *                        - 0  non-vector mode, \ref ECLIC_NON_VECTOR_INTERRUPT
+ *                        - 1  vector mode, \ref ECLIC_VECTOR_INTERRUPT
+ * \remarks
+ * - IRQn must not be negative.
+ * \sa
+ * - \ref ECLIC_SMODE_SetShvIRQ
+ */
+__STATIC_FORCEINLINE uint8_t __ECLIC_GetShvIRQ_S(IRQn_Type IRQn)
+{
+    return ((uint8_t)(((ECLIC->SCTRL[IRQn].INTATTR) & CLIC_INTATTR_SHV_Msk) >> CLIC_INTATTR_SHV_Pos));
+}
+
+/**
+ * \brief  Modify ECLIC Interrupt Input Control Register for a specific interrupt in supervisor mode
+ * \details
+ * This function modify ECLIC Interrupt Input Control(CLICINTCTL[i]) register of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \param [in]      intctrl  Set value for CLICINTCTL[i] register
+ * \remarks
+ * - IRQn must not be negative.
+ * \sa
+ * - \ref ECLIC_GetCtrlIRQ_S
+ */
+__STATIC_FORCEINLINE void __ECLIC_SetCtrlIRQ_S(IRQn_Type IRQn, uint8_t intctrl)
+{
+    ECLIC->SCTRL[IRQn].INTCTRL = intctrl;
+}
+
+/**
+ * \brief  Get ECLIC Interrupt Input Control Register value for a specific interrupt in supervisor mode
+ * \details
+ * This function modify ECLIC Interrupt Input Control register of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \return       value of ECLIC Interrupt Input Control register
+ * \remarks
+ * - IRQn must not be negative.
+ * \sa
+ * - \ref ECLIC_SetCtrlIRQ_S
+ */
+__STATIC_FORCEINLINE uint8_t __ECLIC_GetCtrlIRQ_S(IRQn_Type IRQn)
+{
+    return (ECLIC->SCTRL[IRQn].INTCTRL);
+}
+
+/**
+ * \brief  Set ECLIC Interrupt level of a specific interrupt in supervisor mode
+ * \details
+ * This function set interrupt level of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \param [in]      lvl_abs   Interrupt level
+ * \remarks
+ * - IRQn must not be negative.
+ * - If lvl_abs to be set is larger than the max level allowed, it will be force to be max level.
+ * - When you set level value you need use clciinfo.nlbits to get the width of level.
+ *   Then we could know the maximum of level. CLICINTCTLBITS is how many total bits are
+ *   present in the CLICINTCTL register.
+ * \sa
+ * - \ref ECLIC_GetLevelIRQ_S
+ */
+__STATIC_FORCEINLINE void __ECLIC_SetLevelIRQ_S(IRQn_Type IRQn, uint8_t lvl_abs)
+{
+    uint8_t nlbits = __ECLIC_GetCfgNlbits();
+    uint8_t intctlbits = (uint8_t)__ECLIC_INTCTLBITS;
+
+    if (nlbits == 0) {
+        return;
+    }
+
+    if (nlbits > intctlbits) {
+        nlbits = intctlbits;
+    }
+    uint8_t maxlvl = ((1 << nlbits) - 1);
+    if (lvl_abs > maxlvl) {
+        lvl_abs = maxlvl;
+    }
+    uint8_t lvl = lvl_abs << (ECLIC_MAX_NLBITS - nlbits);
+    uint8_t cur_ctrl = __ECLIC_GetCtrlIRQ_S(IRQn);
+    cur_ctrl = cur_ctrl << nlbits;
+    cur_ctrl = cur_ctrl >> nlbits;
+    __ECLIC_SetCtrlIRQ_S(IRQn, (cur_ctrl | lvl));
+}
+
+
+/**
+ * \brief  Get ECLIC Interrupt level of a specific interrupt
+ * \details
+ * This function get interrupt level of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \return         Interrupt level
+ * \remarks
+ * - IRQn must not be negative.
+ * \sa
+ * - \ref ECLIC_SetLevelIRQ_S
+ */
+__STATIC_FORCEINLINE uint8_t __ECLIC_GetLevelIRQ_S(IRQn_Type IRQn)
+{
+    uint8_t nlbits = __ECLIC_GetCfgNlbits();
+    uint8_t intctlbits = (uint8_t)__ECLIC_INTCTLBITS;
+
+    if (nlbits == 0) {
+        return 0;
+    }
+
+    if (nlbits > intctlbits) {
+        nlbits = intctlbits;
+    }
+    uint8_t intctrl = __ECLIC_GetCtrlIRQ_S(IRQn);
+    uint8_t lvl_abs = intctrl >> (ECLIC_MAX_NLBITS - nlbits);
+    return lvl_abs;
+}
+
+/**
+ * \brief  Set ECLIC Interrupt priority of a specific interrupt in supervisor mode
+ * \details
+ * This function get interrupt priority of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \param [in]      pri   Interrupt priority
+ * \remarks
+ * - IRQn must not be negative.
+ * - If pri to be set is larger than the max priority allowed, it will be force to be max priority.
+ * - Priority width is CLICINTCTLBITS minus clciinfo.nlbits if clciinfo.nlbits
+ *   is less than CLICINTCTLBITS. Otherwise priority width is 0.
+ * \sa
+ * - \ref ECLIC_GetPriorityIRQ_S
+ */
+__STATIC_FORCEINLINE void __ECLIC_SetPriorityIRQ_S(IRQn_Type IRQn, uint8_t pri)
+{
+    uint8_t nlbits = __ECLIC_GetCfgNlbits();
+    uint8_t intctlbits = (uint8_t)__ECLIC_INTCTLBITS;
+    if (nlbits < intctlbits) {
+        uint8_t maxpri = ((1 << (intctlbits - nlbits)) - 1);
+        if (pri > maxpri) {
+            pri = maxpri;
+        }
+        pri = pri << (ECLIC_MAX_NLBITS - intctlbits);
+        uint8_t mask = ((uint8_t)(-1)) >> intctlbits;
+        pri = pri | mask;
+        uint8_t cur_ctrl = __ECLIC_GetCtrlIRQ_S(IRQn);
+        cur_ctrl = cur_ctrl >> (ECLIC_MAX_NLBITS - nlbits);
+        cur_ctrl = cur_ctrl << (ECLIC_MAX_NLBITS - nlbits);
+        __ECLIC_SetCtrlIRQ_S(IRQn, (cur_ctrl | pri));
+    }
+}
+
+/**
+ * \brief  Get ECLIC Interrupt priority of a specific interrupt in supervisor mode
+ * \details
+ * This function get interrupt priority of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \return   Interrupt priority
+ * \remarks
+ * - IRQn must not be negative.
+ * \sa
+ * - \ref ECLIC_SetPriorityIRQ_S
+ */
+__STATIC_FORCEINLINE uint8_t __ECLIC_GetPriorityIRQ_S(IRQn_Type IRQn)
+{
+    uint8_t nlbits = __ECLIC_GetCfgNlbits();
+    uint8_t intctlbits = (uint8_t)__ECLIC_INTCTLBITS;
+    if (nlbits < intctlbits) {
+        uint8_t cur_ctrl = __ECLIC_GetCtrlIRQ_S(IRQn);
+        uint8_t pri = cur_ctrl << nlbits;
+        pri = pri >> nlbits;
+        pri = pri >> (ECLIC_MAX_NLBITS - intctlbits);
+        return pri;
+    } else {
+        return 0;
+    }
+}
+
+/**
+ * \brief  Enable a specific interrupt in supervisor mode
+ * \details
+ * This function enables the specific interrupt \em IRQn.
+ * \param [in]  IRQn  Interrupt number
+ * \remarks
+ * - IRQn must not be negative.
+ * \sa
+ * - \ref ECLIC_DisableIRQ
+ */
+__STATIC_FORCEINLINE void __ECLIC_EnableIRQ_S(IRQn_Type IRQn)
+{
+    ECLIC->SCTRL[IRQn].INTIE |= CLIC_INTIE_IE_Msk;
+}
+
+/**
+ * \brief  Get a specific interrupt enable status in supervisor mode
+ * \details
+ * This function returns the interrupt enable status for the specific interrupt \em IRQn in S MODE.
+ * \param [in]  IRQn  Interrupt number
+ * \returns
+ * - 0  Interrupt is not masked
+ * - 1  Interrupt is enabled
+ * \remarks
+ * - IRQn must not be negative.
+ * \sa
+ * - \ref ECLIC_EnableIRQ_S
+ * - \ref ECLIC_DisableIRQ_S
+ */
+__STATIC_FORCEINLINE uint8_t __ECLIC_GetEnableIRQ_S(IRQn_Type IRQn)
+{
+    return ((uint8_t) (ECLIC->SCTRL[IRQn].INTIE) & CLIC_INTIE_IE_Msk);
+}
+
+/**
+ * \brief  Disable a specific interrupt in supervisor mode
+ * \details
+ * This function disables the specific interrupt \em IRQn.
+ * \param [in]  IRQn  Number of the external interrupt to disable
+ * \remarks
+ * - IRQn must not be negative.
+ * \sa
+ * - \ref ECLIC_EnableIRQ
+ */
+__STATIC_FORCEINLINE void __ECLIC_DisableIRQ_S(IRQn_Type IRQn)
+{
+    ECLIC->SCTRL[IRQn].INTIE &= ~CLIC_INTIE_IE_Msk;
+}
+
+/**
+ * \brief  Set Interrupt Vector of a specific interrupt in supervisor mode
+ * \details
+ * This function set interrupt handler address of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \param [in]      vector   Interrupt handler address
+ * \remarks
+ * - IRQn must not be negative.
+ * - You can set the \ref CSR_CSR_MTVT to set interrupt vector table entry address.
+ * - If your vector table is placed in readonly section, the vector for IRQn will not be modified.
+ *   For this case, you need to use the correct irq handler name defined in your vector table as
+ *   your irq handler function name.
+ * - This function will only work correctly when the vector table is placed in an read-write enabled section.
+ * \sa
+ * - \ref ECLIC_GetVector_S
+ */
+__STATIC_FORCEINLINE void __ECLIC_SetVector_S(IRQn_Type IRQn, rv_csr_t vector)
+{
+    volatile unsigned long vec_base;
+    vec_base = ((unsigned long)__RV_CSR_READ(CSR_STVT));
+    vec_base += ((unsigned long)IRQn) * sizeof(unsigned long);
+    (* (unsigned long *) vec_base) = vector;
+#if (defined(__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1))
+#if (defined(__CCM_PRESENT) && (__CCM_PRESENT == 1))
+    SFlushDCacheLine((unsigned long)vec_base);
+#endif
+#endif
+#if (defined(__ICACHE_PRESENT) && (__ICACHE_PRESENT == 1))
+#if (defined(__CCM_PRESENT) && (__CCM_PRESENT == 1))
+    SInvalICacheLine((unsigned long)vec_base);
+#else
+    __FENCE_I();
+#endif
+#endif
+}
+
+/**
+ * \brief  Get Interrupt Vector of a specific interrupt in supervisor mode
+ * \details
+ * This function get interrupt handler address of the specific interrupt \em IRQn.
+ * \param [in]      IRQn  Interrupt number
+ * \return        Interrupt handler address
+ * \remarks
+ * - IRQn must not be negative.
+ * - You can read \ref CSR_CSR_MTVT to get interrupt vector table entry address.
+ * \sa
+ *     - \ref ECLIC_SMODE_SetVector
+ */
+__STATIC_FORCEINLINE rv_csr_t __ECLIC_GetVector_S(IRQn_Type IRQn)
+{
+#if __RISCV_XLEN == 32
+    return (*(uint32_t *)(__RV_CSR_READ(CSR_STVT) + IRQn * 4));
+#elif __RISCV_XLEN == 64
+    return (*(uint64_t *)(__RV_CSR_READ(CSR_STVT) + IRQn * 8));
+#else // TODO Need cover for XLEN=128 case in future
+    return (*(uint64_t *)(__RV_CSR_READ(CSR_STVT) + IRQn * 8));
+#endif
+}
+
+#endif /* defined(__TEE_PRESENT) && (__TEE_PRESENT == 1) */
 
 /**
  * \brief  Set Exception entry address
@@ -751,7 +1224,8 @@ __STATIC_FORCEINLINE rv_csr_t __ECLIC_GetVector(IRQn_Type IRQn)
  * This function set exception handler address to 'CSR_MTVEC'.
  * \param [in]      addr  Exception handler address
  * \remarks
- * - This function use to set exception handler address to 'CSR_MTVEC'. Address is 4 bytes align.
+ * - This function use to set exception handler address to 'CSR_MTVEC'.
+ *   Address need to be aligned to 64 bytes.
  * \sa
  * - \ref __get_exc_entry
  */
@@ -768,7 +1242,8 @@ __STATIC_FORCEINLINE void __set_exc_entry(rv_csr_t addr)
  * This function get exception handler address from 'CSR_MTVEC'.
  * \return       Exception handler address
  * \remarks
- * - This function use to get exception handler address from 'CSR_MTVEC'. Address is 4 bytes align
+ * - This function use to get exception handler address from 'CSR_MTVEC'.
+ *   Address need to be aligned to 64 bytes.
  * \sa
  * - \ref __set_exc_entry
  */
@@ -791,7 +1266,7 @@ __STATIC_FORCEINLINE rv_csr_t __get_exc_entry(void)
  */
 __STATIC_FORCEINLINE void __set_nonvec_entry(rv_csr_t addr)
 {
-    if (__RV_CSR_READ(CSR_MTVT2) & 0x1){
+    if (__RV_CSR_READ(CSR_MTVT2) & 0x1) {
         __RV_CSR_WRITE(CSR_MTVT2, addr | 0x01);
     } else {
         addr &= (rv_csr_t)(~0x3F);
@@ -872,6 +1347,13 @@ __STATIC_FORCEINLINE rv_csr_t __get_nmi_entry(void)
         rv_csr_t __msubm = __RV_CSR_READ(CSR_MSUBM);                        \
         __enable_irq();
 
+/*! Save necessary CSRs into variables for vector interrupt nesting in supervisor mode */
+#define SAVE_IRQ_CSR_CONTEXT_S()                                            \
+        rv_csr_t __scause = __RV_CSR_READ(CSR_SCAUSE);                      \
+        rv_csr_t __sepc = __RV_CSR_READ(CSR_SEPC);                          \
+        __enable_irq_s();
+
+
 /**
  * \brief   Restore necessary CSRs from variables for vector interrupt nesting
  * \details
@@ -887,6 +1369,11 @@ __STATIC_FORCEINLINE rv_csr_t __get_nmi_entry(void)
         __RV_CSR_WRITE(CSR_MEPC, __mepc);                                   \
         __RV_CSR_WRITE(CSR_MCAUSE, __mcause);
 
+/*! Restore necessary CSRs from variables for vector interrupt nesting in supervisor mode */
+#define RESTORE_IRQ_CSR_CONTEXT_S()                                         \
+        __disable_irq_s();                                                  \
+        __RV_CSR_WRITE(CSR_SEPC, __sepc);                                   \
+        __RV_CSR_WRITE(CSR_SCAUSE, __scause);
 /** @} */ /* End of Doxygen Group NMSIS_Core_IntExc */
 
 #endif /* defined(__ECLIC_PRESENT) && (__ECLIC_PRESENT == 1) */
@@ -894,4 +1381,4 @@ __STATIC_FORCEINLINE rv_csr_t __get_nmi_entry(void)
 #ifdef __cplusplus
 }
 #endif
-#endif /** __CORE_FEATURE_ECLIC__ */
+#endif /* __CORE_FEATURE_ECLIC__ */
