@@ -116,7 +116,7 @@
     .globl vector_base
     .type vector_base, @object
 vector_base:
-#if defined(DOWNLOAD_MODE) && (DOWNLOAD_MODE != DOWNLOAD_MODE_FLASH)
+#ifndef VECTOR_TABLE_REMAPPED
     j _start                                                /* 0: Reserved, Jump to _start when reset for ILM/FlashXIP mode.*/
     .align LOG_REGBYTES                                     /*    Need to align 4 byte for RV32, 8 Byte for RV64 */
 #else

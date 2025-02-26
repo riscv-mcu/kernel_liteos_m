@@ -97,10 +97,10 @@ OTHER_FLAGS += -g -mcmodel=medany -fno-common
 
 # macros for gcc
 # AS defines
-AS_DEFS = -DDOWNLOAD_MODE=DOWNLOAD_MODE_ILM
+AS_DEFS = -DDOWNLOAD_MODE_STRING=\"ILM\"
 
 # C defines
-C_DEFS = -DDOWNLOAD_MODE=DOWNLOAD_MODE_ILM
+C_DEFS = -DDOWNLOAD_MODE_STRING=\"ILM\"
 
 
 # AS includes

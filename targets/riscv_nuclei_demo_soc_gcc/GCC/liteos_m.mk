@@ -26,9 +26,7 @@ C_INCLUDES    += -I$(LITEOSTOPDIR)/components/bounds_checking_function/include \
 C_SOURCES     += $(wildcard $(LITEOSTOPDIR)/components/bounds_checking_function/src/*.c)
 
 # NMSIS related
-C_INCLUDES    += -I$(LITEOSTOPDIR)/kernel/arch/risc-v/nuclei/gcc/nmsis/Core/Include \
-                 -I$(LITEOSTOPDIR)/kernel/arch/risc-v/nuclei/gcc/nmsis/DSP/Include \
-                 -I$(LITEOSTOPDIR)/kernel/arch/risc-v/nuclei/gcc/nmsis/NN/Include
+C_INCLUDES    += -I$(LITEOSTOPDIR)/kernel/arch/risc-v/nuclei/gcc/nmsis/Core/Include
 
 ASM_SOURCES   += $(wildcard $(LITEOSTOPDIR)/kernel/arch/risc-v/nuclei/gcc/*.s)
 
