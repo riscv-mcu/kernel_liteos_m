@@ -1,0 +1,581 @@
+## Package Base Information
+## This npk.yml only works with Nuclei Studio 2023.10 or later
+name: ssp-nsdk_evalsoc
+owner: nuclei
+description: Nuclei EvalSoC Support Package
+type: ssp
+keywords:
+  - soc
+  - risc-v
+  - nuclei
+license: Apache-2.0
+homepage: https://nucleisys.com/developboard.php#ddr200t
+
+packinfo:
+  core_vendor: Nuclei
+  vendor: Nuclei
+  name: Nuclei FPGA Evaluation SoC
+  doc:
+    website: https://nucleisys.com/developboard.php#ddr200t # Website
+    datasheet: https://nucleisys.com/developboard.php#ddr200t # SoC datasheet
+    usermanual: https://nucleisys.com/developboard.php#ddr200t # User Manual
+    extra:
+      - uri: # file path or web link
+        description: # description
+
+## Package Dependency
+dependencies:
+  - name: csp-nsdk_nmsis
+    version:
+
+## Package Configurations
+configuration:
+  nuclei_core:
+    default_value: n300fd
+    type: choice
+    global: true
+    description: Nuclei RISC-V Core
+    # tips introduced in Nuclei Studio 2023.10
+    tips: "Select Nuclei Core to match basic RISC-V ARCH and ABI, used together with below Nuclei ARCH Extensions"
+    choices:
+      - name: n200
+        arch: rv32imc
+        abi: ilp32
+        cmodel: medlow
+        tune: nuclei-200-series
+        description: N200 Core(ARCH=rv32imc, ABI=ilp32)
+      - name: n200e
+        arch: rv32emc
+        abi: ilp32e
+        cmodel: medlow
+        tune: nuclei-200-series
+        description: N200E Core(ARCH=rv32emc, ABI=ilp32e)
+      - name: n201
+        arch: rv32iac
+        abi: ilp32
+        cmodel: medlow
+        tune: nuclei-200-series
+        description: N201 Core(ARCH=rv32iac, ABI=ilp32)
+      - name: n201e
+        arch: rv32eac
+        abi: ilp32e
+        cmodel: medlow
+        tune: nuclei-200-series
+        description: N201E Core(ARCH=rv32eac, ABI=ilp32e)
+      - name: n202
+        arch: rv32ic
+        abi: ilp32
+        cmodel: medlow
+        tune: nuclei-200-series
+        description: N202 Core(ARCH=rv32ic, ABI=ilp32)
+      - name: n202e
+        arch: rv32ec
+        abi: ilp32e
+        cmodel: medlow
+        tune: nuclei-200-series
+        description: N202E Core(ARCH=rv32ec, ABI=ilp32e)
+      - name: n203
+        arch: rv32imac
+        abi: ilp32
+        cmodel: medlow
+        tune: nuclei-200-series
+        description: N203 Core(ARCH=rv32imac, ABI=ilp32)
+      - name: n203e
+        arch: rv32emac
+        abi: ilp32e
+        cmodel: medlow
+        tune: nuclei-200-series
+        description: N203E Core(ARCH=rv32emac, ABI=ilp32e)
+      - name: n300
+        arch: rv32imac
+        abi: ilp32
+        cmodel: medlow
+        tune: nuclei-300-series
+        description: N300 Core(ARCH=rv32imac, ABI=ilp32)
+      - name: n300f
+        arch: rv32imafc
+        abi: ilp32f
+        cmodel: medlow
+        tune: nuclei-300-series
+        description: N300F Core(ARCH=rv32imafc, ABI=ilp32f)
+      - name: n300fd
+        arch: rv32imafdc
+        abi: ilp32d
+        cmodel: medlow
+        tune: nuclei-300-series
+        description: N300FD Core(ARCH=rv32imafdc, ABI=ilp32d)
+      - name: n600
+        arch: rv32imac
+        abi: ilp32
+        cmodel: medlow
+        tune: nuclei-600-series
+        description: N600 Core(ARCH=rv32imac, ABI=ilp32)
+      - name: n600f
+        arch: rv32imafc
+        abi: ilp32f
+        cmodel: medlow
+        tune: nuclei-600-series
+        description: N600F Core(ARCH=rv32imafc, ABI=ilp32f)
+      - name: n600fd
+        arch: rv32imafdc
+        abi: ilp32d
+        cmodel: medlow
+        tune: nuclei-600-series
+        description: N600FD Core(ARCH=rv32imafdc, ABI=ilp32d)
+      - name: u600
+        arch: rv32imac
+        abi: ilp32
+        cmodel: medlow
+        tune: nuclei-600-series
+        description: U600 Core(ARCH=rv32imac, ABI=ilp32)
+      - name: u600f
+        arch: rv32imafc
+        abi: ilp32f
+        cmodel: medlow
+        tune: nuclei-600-series
+        description: U600F Core(ARCH=rv32imafc, ABI=ilp32f)
+      - name: u600fd
+        arch: rv32imafdc
+        abi: ilp32d
+        cmodel: medlow
+        tune: nuclei-600-series
+        description: U600FD Core(ARCH=rv32imafdc, ABI=ilp32d)
+      - name: nx600
+        arch: rv64imac
+        abi: lp64
+        cmodel: medany
+        tune: nuclei-600-series
+        description: NX600 Core(ARCH=rv64imac, ABI=lp64)
+      - name: nx600f
+        arch: rv64imafc
+        abi: lp64f
+        cmodel: medany
+        tune: nuclei-600-series
+        description: NX600F Core(ARCH=rv64imafc, ABI=lp64f)
+      - name: nx600fd
+        arch: rv64imafdc
+        abi: lp64d
+        cmodel: medany
+        tune: nuclei-600-series
+        description: NX600FD Core(ARCH=rv64imafdc, ABI=lp64d)
+      - name: ux600
+        arch: rv64imac
+        abi: lp64
+        cmodel: medany
+        tune: nuclei-600-series
+        description: UX600 Core(ARCH=rv64imac, ABI=lp64)
+      - name: ux600f
+        arch: rv64imafc
+        abi: lp64f
+        cmodel: medany
+        tune: nuclei-600-series
+        description: UX600F Core(ARCH=rv64imafc, ABI=lp64f)
+      - name: ux600fd
+        arch: rv64imafdc
+        abi: lp64d
+        cmodel: medany
+        tune: nuclei-600-series
+        description: UX600FD Core(ARCH=rv64imafdc, ABI=lp64d)
+      - name: n900
+        arch: rv32imac
+        abi: ilp32
+        cmodel: medlow
+        tune: nuclei-900-series
+        description: N900 Core(ARCH=rv32imac, ABI=ilp32)
+      - name: n900f
+        arch: rv32imafc
+        abi: ilp32f
+        cmodel: medlow
+        tune: nuclei-900-series
+        description: N900F Core(ARCH=rv32imafc, ABI=ilp32f)
+      - name: n900fd
+        arch: rv32imafdc
+        abi: ilp32d
+        cmodel: medlow
+        tune: nuclei-900-series
+        description: N900FD Core(ARCH=rv32imafdc, ABI=ilp32d)
+      - name: nx900
+        arch: rv64imac
+        abi: lp64
+        cmodel: medany
+        tune: nuclei-900-series
+        description: NX900 Core(ARCH=rv64imac, ABI=lp64)
+      - name: nx900f
+        arch: rv64imafc
+        abi: lp64f
+        cmodel: medany
+        tune: nuclei-900-series
+        description: NX900F Core(ARCH=rv64imafc, ABI=lp64f)
+      - name: nx900fd
+        arch: rv64imafdc
+        abi: lp64d
+        cmodel: medany
+        tune: nuclei-900-series
+        description: NX900FD Core(ARCH=rv64imafdc, ABI=lp64d)
+      - name: u900
+        arch: rv32imac
+        abi: ilp32
+        cmodel: medlow
+        tune: nuclei-900-series
+        description: U900 Core(ARCH=rv32imac, ABI=ilp32)
+      - name: u900f
+        arch: rv32imafc
+        abi: ilp32f
+        cmodel: medlow
+        tune: nuclei-900-series
+        description: U900F Core(ARCH=rv32imafc, ABI=ilp32f)
+      - name: u900fd
+        arch: rv32imafdc
+        abi: ilp32d
+        cmodel: medlow
+        tune: nuclei-900-series
+        description: U900FD Core(ARCH=rv32imafdc, ABI=ilp32d)
+      - name: ux900
+        arch: rv64imac
+        abi: lp64
+        cmodel: medany
+        tune: nuclei-900-series
+        description: UX900 Core(ARCH=rv64imac, ABI=lp64)
+      - name: ux900f
+        arch: rv64imafc
+        abi: lp64f
+        cmodel: medany
+        tune: nuclei-900-series
+        description: UX900F Core(ARCH=rv64imafc, ABI=lp64f)
+      - name: ux900fd
+        arch: rv64imafdc
+        abi: lp64d
+        cmodel: medany
+        tune: nuclei-900-series
+        description: UX900FD Core(ARCH=rv64imafdc, ABI=lp64d)
+      - name: nx1000
+        arch: rv64imac
+        abi: lp64
+        cmodel: medany
+        tune: nuclei-1000-series
+        description: NX1000 Core(ARCH=rv64imac, ABI=lp64)
+      - name: nx1000f
+        arch: rv64imafc
+        abi: lp64f
+        cmodel: medany
+        tune: nuclei-1000-series
+        description: NX1000F Core(ARCH=rv64imafc, ABI=lp64f)
+      - name: nx1000fd
+        arch: rv64imafdc
+        abi: lp64d
+        cmodel: medany
+        tune: nuclei-1000-series
+        description: NX1000FD Core(ARCH=rv64imafdc, ABI=lp64d)
+      - name: ux1000
+        arch: rv64imac
+        abi: lp64
+        cmodel: medany
+        tune: nuclei-1000-series
+        description: UX1000 Core(ARCH=rv64imac, ABI=lp64)
+      - name: ux1000f
+        arch: rv64imafc
+        abi: lp64f
+        cmodel: medany
+        tune: nuclei-1000-series
+        description: UX1000F Core(ARCH=rv64imafc, ABI=lp64f)
+      - name: ux1000fd
+        arch: rv64imafdc
+        abi: lp64d
+        cmodel: medany
+        tune: nuclei-1000-series
+        description: UX1000FD Core(ARCH=rv64imafdc, ABI=lp64d)
+  nuclei_archext:
+    default_value: ""
+    type: text
+    # hints and tips are introduced in Nuclei Studio 2023.10
+    # used to show tool tips and input hints
+    tips: "Possible other ISA extensions, seperated by underscores, like '_zba_zbb_zbc_zbs_xxldspn1x'"
+    hints: "_zba_zbb_zbc_zbs_xxldsp"
+    global: true
+    description: ARCH Extensions(ARCH_EXT=)
+  nuclei_cache:
+    default_value: []
+    type: multicheckbox_v2
+    global: true
+    tips: "Click to enable I/D Cache and CCM to override default settings defined in cpufeature.h"
+    description: Nuclei Cache Extensions
+    param:
+      name:
+        [ic, dc, ccm]
+      description:
+        [ICache, DCache, CCM]
+  nuclei_smp:
+    default_value: 0
+    type: spinner
+    global: true
+    tips: "SMP CPU Number, if above 1, you should set proper heap and stack size"
+    description: Nuclei SMP Count
+    param:
+      range: >-
+          [0, 16, 1]
+  boothartid:
+    default_value: 0
+    type: spinner
+    global: true
+    tips: "Select which hart chosen by hartid is the boot hart"
+    description: Boot HartID
+    param:
+      range: >-
+          [0, 15, 1]
+  heapsz:
+    value: ""
+    type: text
+    # hints and tips are introduced in Nuclei Studio 2023.10
+    # used to show tool tips and input hints
+    tips: "Heap size in bytes, eg. 4K or 4096, leave it blank for default linker script settings"
+    hints: "4K"
+    description: Heap Size
+  stacksz:
+    value: ""
+    type: text
+    # hints and tips are introduced in Nuclei Studio 2023.10
+    # used to show tool tips and input hints
+    tips: "Stack size in bytes for each cpu, eg. 4K or 4096, leave it blank for default linker script settings"
+    hints: "4K"
+    description: Stack Size Per CPU
+  semihost:
+    default_value: 0
+    type: checkbox
+    tips: "If semihosting is enabled, c library stub source files will not be copied"
+    description: Enable Semihosting
+  stdclib:
+    default_value: newlib_nano
+    type: choice
+    global: true
+    tips: "Select proper c library, code size usage newlib_full > nuclei_nano > libncrt, libncrt only works for rv32"
+    description: Standard C Library(STDCLIB=)
+    choices:
+      - name: newlib_full
+        description: "newlib_full: newlib with full feature"
+      - name: newlib_fast
+        description: "newlib_fast: newlib nano with printf/scanf float"
+      - name: newlib_small
+        description: "newlib_small: newlib nano with printf float"
+      - name: newlib_nano
+        description: "newlib_nano: newlib nano without printf/scanf float"
+      - name: libncrt_fast
+        description: "libncrt_fast: nuclei c runtime library, optimized for speed"
+      - name: libncrt_balanced
+        description: "libncrt_balanced: nuclei c runtime library, balanced, full feature"
+      - name: libncrt_small
+        description: "libncrt_small: nuclei c runtime library, optimized for size, full feature"
+      - name: libncrt_nano
+        description: "libncrt_nano: nuclei c runtime library, optimized for size, no float support"
+      - name: libncrt_pico
+        description: "libncrt_pico: nuclei c runtime library, optimized for size, no long/long long support"
+      - name: nostd
+        description: "nostd: no std c library will be used, and don't search the standard system directories for header files"
+      - name: nospec
+        description: "nospec: no std c library will be used, not pass any --specs options"
+  linker_script:
+    default_value: ""
+    type: text
+    # used as npk pass variable, not a global configuration
+    global: false
+    description: Alternative linker script
+
+## Source Code Management
+codemanage:
+  installdir: evalsoc
+  copyfiles:
+    - path: ["Source/*.c", "Source/Drivers/*.c", "Source/GCC/", "Include/", "evalsoc.svd"]
+    - path: ["Source/Stubs/newlib"]
+      condition: $( startswith(${stdclib}, "newlib") && ${semihost} == 0 )
+    - path: ["Source/Stubs/libncrt"]
+      condition: $( startswith(${stdclib}, "libncrt") && ${buildconfig.type} != "zcc" )
+    - path: ["Source/Stubs/newlib"]
+      condition: $( startswith(${stdclib}, "libncrt") && ${buildconfig.type} == "zcc" )
+  incdirs:
+    - path: ["Include/"]
+
+## Set Configuration for other packages
+setconfig:
+  - config: nuclei_arch
+    value: $(subst(${nuclei_core.arch},c,))${nuclei_archext}
+    condition: $( contains(${nuclei_archext}, "zc"))
+  - config: nuclei_arch
+    value: ${nuclei_core.arch}${nuclei_archext}
+    condition: $( ! contains(${nuclei_archext}, "zc"))
+  - config: nmsislibarch
+    value: ${nuclei_arch}
+  - config: cpu_series
+    value: 200
+    condition: $( contains(${nuclei_core}, "20"))
+  - config: cpu_series
+    value: 300
+    condition: $( contains(${nuclei_core}, "30"))
+  - config: cpu_series
+    value: 600
+    condition: $( contains(${nuclei_core}, "60"))
+  - config: cpu_series
+    value: 900
+    condition: $( contains(${nuclei_core}, "90"))
+  - config: cpu_series
+    value: 1000
+    condition: $( contains(${nuclei_core}, "100"))
+
+## Debug Configuration for this SoC
+debugconfig:
+  - type: openocd
+    description: Nuclei OpenOCD
+    svd: evalsoc.svd
+
+  - type: qemu
+    description: Nuclei QEMU
+    svd: evalsoc.svd
+
+  - type: jlink
+    description: Segger Jlink
+    svd: evalsoc.svd
+
+## Build Configuration
+buildconfig:
+  - type: common
+    common_flags: # flags need to be combined together across all packages
+      - flags: -g -fno-common -ffunction-sections -fdata-sections
+      - flags: -march=${nuclei_arch} -mabi=${nuclei_core.abi}
+      - flags: -mcmodel=${nuclei_core.cmodel}
+      - flags: -nostdinc
+        condition: $( ${stdclib} == "nostd" )
+      - flags:
+        condition: $( ${stdclib} == "nospec" )
+      # For newlib nano, use system include newlib-nano
+      - flags: -isystem =/include/newlib-nano
+        condition: $( startswith(${stdclib}, "newlib") && ${stdclib} != "newlib_full" )
+    ldflags:
+      - flags: -nostartfiles -nodefaultlibs
+      - flags: -Wl,--gc-sections -Wl,--check-sections
+      - flags: -Wl,--defsym=__SMP_CPU_CNT=${nuclei_smp}
+        condition: $( ${nuclei_smp} > 1 )
+      - flags: -Wl,--defsym=__HEAP_SIZE=${heapsz}
+        condition: $( ${heapsz} != "" )
+      - flags: -Wl,--defsym=__STACK_SIZE=${stacksz}
+        condition: $( ${stacksz} != "" )
+    cflags:
+    asmflags:
+      - flags: -x assembler-with-cpp
+    cxxflags:
+    common_defines:
+      - defines: SMP_CPU_CNT=${nuclei_smp}
+        condition: $( ${nuclei_smp} > 1 )
+      - defines: BOOT_HARTID=${boothartid}
+      - defines: RUNMODE_IC_EN=1
+        condition: $( contains(${nuclei_cache}, "ic"))
+      - defines: RUNMODE_DC_EN=1
+        condition: $( contains(${nuclei_cache}, "dc"))
+      - defines: RUNMODE_CCM_EN=1
+        condition: $( contains(${nuclei_cache}, "ccm"))
+    prebuild_steps: # could be override by app/bsp type
+      command:
+      description:
+    postbuild_steps: # could be override by app/bsp type
+      command:
+      description:
+
+  - type: gcc
+    description: Nuclei GNU Toolchain
+    toolchain_name: RISC-V GCC/Newlib
+    cross_prefix: riscv64-unknown-elf- # optional
+    common_flags: # flags need to be combined together across all packages
+      - flags: -mtune=${nuclei_core.tune}
+        condition: $( ${nuclei_core.tune} != "" )
+      # pass extra flags when zc extension enabled
+      - flags: -fomit-frame-pointer -fno-shrink-wrap-separate
+        condition: $( contains(${nuclei_archext}, "zc"))
+      - flags: -isystem =/include/libncrt
+        condition: $( startswith(${stdclib}, "libncrt") )
+    ldflags:
+      - flags: -lstdc++
+        condition: $( startswith(${stdclib}, "newlib") )
+      - flags: -lc -lgcc
+        condition: $( ${stdclib} == "newlib_full" )
+      - flags: -lc_nano -lgcc -u _printf_float -u _scanf_float
+        condition: $( ${stdclib} == "newlib_fast" )
+      - flags: -lc_nano -lgcc -u _printf_float
+        condition: $( ${stdclib} == "newlib_small" )
+      - flags: -l$(subst(${stdclib},lib,)) -lheapops_basic
+        condition: $( startswith(${stdclib}, "libncrt") )
+      - flags: -lfileops_semi
+        condition: $( startswith(${stdclib}, "libncrt") && ${semihost} == 1 )
+      - flags: -lfileops_uart
+        condition: $( startswith(${stdclib}, "libncrt") && ${semihost} == 0 )
+      # Workaround for libncrt possible linking error since ide dont support wrap search library
+      # Require Nuclei Studio Plugin released in 2024
+      - flags: -l$(subst(${stdclib},lib,))
+        condition: $( startswith(${stdclib}, "libncrt") )
+      - flags: -Wl,--no-warn-rwx-segments
+      - flags: -lc_nano -lgcc
+        condition: $( ${stdclib} == "newlib_nano" )
+      - flags: -lsemihost
+        condition: $( startswith(${stdclib}, "newlib") && ${semihost} == 1 )
+      - flags: -u _isatty -u _write -u _sbrk -u _read -u _close -u _fstat -u _lseek -u errno
+        condition: $( startswith(${stdclib}, "newlib") )
+
+  - type: clang
+    description: Nuclei LLVM Toolchain
+    toolchain_name: RISC-V Clang/Newlib
+    cross_prefix: riscv64-unknown-elf- # optional
+    common_flags: # flags need to be combined together across all packages
+      # Enable experimental extensions for clang
+      - flags: -menable-experimental-extensions
+      - flags: -isystem =/include/libncrt
+        condition: $( startswith(${stdclib}, "libncrt") )
+    ldflags:
+      - flags: -lstdc++
+        condition: $( startswith(${stdclib}, "newlib") )
+      - flags: -lc -lgcc
+        condition: $( ${stdclib} == "newlib_full" )
+      - flags: -lc_nano -lgcc -u _printf_float -u _scanf_float
+        condition: $( ${stdclib} == "newlib_fast" )
+      - flags: -lc_nano -lgcc -u _printf_float
+        condition: $( ${stdclib} == "newlib_small" )
+      - flags: -l$(subst(${stdclib},lib,)) -lheapops_basic
+        condition: $( startswith(${stdclib}, "libncrt") )
+      - flags: -lfileops_semi
+        condition: $( startswith(${stdclib}, "libncrt") && ${semihost} == 1 )
+      - flags: -lfileops_uart
+        condition: $( startswith(${stdclib}, "libncrt") && ${semihost} == 0 )
+      # Workaround for libncrt possible linking error since ide dont support wrap search library
+      # Require Nuclei Studio Plugin released in 2024
+      - flags: -l$(subst(${stdclib},lib,))
+        condition: $( startswith(${stdclib}, "libncrt") )
+      - flags: -fuse-ld=lld
+      - flags: -u __on_exit_args
+        condition: $( startswith(${stdclib}, "newlib") )
+      # for clang, newlib_nano still need to define symbol _printf_float to make link pass
+      - flags: -lc_nano -lgcc -u _printf_float
+        condition: $( ${stdclib} == "newlib_nano" )
+      - flags: -lsemihost
+        condition: $( startswith(${stdclib}, "newlib") && ${semihost} == 1 )
+
+  - type: zcc
+    description: Terapines ZCC Toolchain
+    toolchain_name: Terapines ZCC
+    common_flags: # flags need to be combined together across all packages
+      # Enable experimental extensions for zcc
+      - flags: -menable-experimental-extensions
+      - flags: -mtune=${nuclei_core.tune}
+        condition: $( ${nuclei_core.tune} != "" )
+    ldflags:
+      - flags: -lc++ -lunwind
+        condition: $( startswith(${stdclib}, "newlib") )
+      - flags: -lc -lclang_rt.builtins
+        condition: $( ${stdclib} == "newlib_full" )
+      - flags: -lc_nano -lclang_rt.builtins -u _printf_float -u _scanf_float
+        condition: $( ${stdclib} == "newlib_fast" )
+      - flags: -lc_nano -lclang_rt.builtins -u _printf_float
+        condition: $( ${stdclib} == "newlib_small" )
+      - flags: -lc_nano -lclang_rt.builtins -u _printf_float
+        condition: $( startswith(${stdclib}, "libncrt") )
+      - flags: -fuse-ld=lld
+      - flags: -u __on_exit_args
+        condition: $( startswith(${stdclib}, "newlib") )
+      - flags: -lc_nano -lclang_rt.builtins
+        condition: $( ${stdclib} == "newlib_nano" )
+      - flags: -lsemihost
+        condition: $( ${semihost} == 1 )
