@@ -1,5 +1,9 @@
 # LiteOS-M内核<a name="ZH-CN_TOPIC_0000001096757661"></a>
 
+> [!NOTE]
+>
+> Looking for Nuclei RISC-V support, please check [targets/riscv_nuclei_demo_soc_gcc/README.md](targets/riscv_nuclei_demo_soc_gcc/README.md)
+
 -   [简介](#section11660541593)
 -   [目录](#section161941989596)
 -   [约束](#section119744591305)

@@ -1,5 +1,9 @@
 # LiteOS Cortex-M<a name="EN-US_TOPIC_0000001096757661"></a>
 
+> [!NOTE]
+>
+> Looking for Nuclei RISC-V support, please check [targets/riscv_nuclei_demo_soc_gcc/README.md](targets/riscv_nuclei_demo_soc_gcc/README.md)
+
 -   [Introduction](#section11660541593)
 -   [Directory Structure](#section161941989596)
 -   [Constraints](#section119744591305)
