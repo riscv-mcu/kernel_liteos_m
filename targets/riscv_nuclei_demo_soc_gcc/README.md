@@ -85,6 +85,9 @@ Nuclei DDR200T开发板是一款集成了FPGA和通用MCU的RISC-V评估开发�
    - 点击图中蓝框2-1下载64bit的OpenOCD
    - **确保Make工具版本不低于3.82**: ubuntu系统使用`sudo apt-get install make`指令安装`make`工具, CentOS系统使用`sudo yum install make`指令安装。
 
+> 目前本分支需要使用2022.12版本的工具链，如果你使用的是新版本，则需要手动修改下`GCC/Makefile`里面的**PREFIX**,
+> 将`riscv-nuclei-elf-` 改成 `riscv64-unknown-elf-`即可，否则编译会报错
+
 图1 Linux环境要下载的Nuclei Tools
 
 ![Nuclei Tools need to be downloaded for Linux](doc/image/nuclei_tools_download_linux.png)
@@ -163,7 +166,7 @@ make clean
 
 调试或运行前请先是用蜂鸟调试器连接Nuclei DDR200T开发板，确保已按照[环境配置](#sectionb1)中驱动配置部分配置完成。
 
-同样配置好`NUCLEI_TOOL_ROOT`路径并打开至代码根目录下的/target/riscv_nuclei_demo_soc_gcc/GCC位置，输入如下指令进入GDB调试：
+同样配置好`NUCLEI_TOOL_ROOT`路径并打开至代码根目录下的``target/riscv_nuclei_demo_soc_gcc/GCC``位置，输入如下指令进入GDB调试：
 
 ```
 make debug
@@ -200,7 +203,7 @@ TaskSampleEntry2 running...
 TaskSampleEntry1 running...
 ```
 
-也可以在Nuclei Qemu **2022.12**版本上运行，运行方法如下
+也可以在Nuclei Qemu **2022.12**版本上运行，后续版本运行会报错（不建议使用，后续新版本会修复问题），运行方法如下
 
 ~~~shell
 qemu-system-riscv32 -M nuclei_n,download=ilm -cpu nuclei-n300fd,ext= -smp 1 -icount shift=0 -nodefaults -nographic -serial stdio -kernel build/Nuclei-demo-soc.elf
