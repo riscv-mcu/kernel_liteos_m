@@ -92,8 +92,6 @@ Nuclei DDR200T开发板是一款集成了FPGA和通用MCU的RISC-V评估开发�
 
 ![Nuclei Tools need to be downloaded for Linux](doc/image/nuclei_tools_download_linux.png)
 
-
-
 3. 在之前新建的`Nuclei`文件夹中新建`gcc`文件夹和`openocd`文件夹。
    - 解压缩之前下载的**gnu工具链**到任意文件夹中，复制其中`bin`文件件所在层级的所有内容到`gcc`文件夹中。
    - 同样解压缩之前下载的**OpenOCD**到任意文件夹中，复制其中`bin`文件件所在层级的所有内容到`openocd`文件夹中。
@@ -101,6 +99,13 @@ Nuclei DDR200T开发板是一款集成了FPGA和通用MCU的RISC-V评估开发�
 > 注意：
 >
 > ​	请务必下载并解压缩Linux版本的工具，不要下载windows版本工具。
+
+**温馨提示**：如果使用最新的evalsoc的bitstream测试，需要手动修改下`targets/riscv_nuclei_demo_soc_gcc/SoC/demosoc/Common/Include/demosoc.h`里面的
+
+- ``__ECLIC_BASEADDR`` : ``0x18020000UL``
+- ``__SYSTIMER_BASEADDR`` : ``0x18030000UL``
+
+目前最新的代码已经修改了上面的两个基地址，以及工具链版本为 2025.02
 
 - **驱动配置**
 
@@ -176,6 +181,8 @@ make debug
 
 若想直接运行，请在调试时所在位置输入如下指令：
 
+> 对于新版本的evalsoc的bitstream，需要修改下这里的代码，测试运行，修改方法在最下面
+
 ```
 make upload
 ```
@@ -205,6 +212,8 @@ TaskSampleEntry1 running...
 
 也可以在Nuclei Qemu **2022.12**版本上运行，后续版本运行会报错（不建议使用，后续新版本会修复问题），运行方法如下
 
+> 采用这个版本运行，需要确认下 ECLIC和SYSTIMER的基地址，不建议，建议使用下面提供的最新的版本运行
+
 ~~~shell
 qemu-system-riscv32 -M nuclei_n,download=ilm -cpu nuclei-n300fd,ext= -smp 1 -icount shift=0 -nodefaults -nographic -serial stdio -kernel build/Nuclei-demo-soc.elf
 
@@ -218,6 +227,45 @@ TaskSampleEntry2 running...
 TaskSampleEntry1 running...
 TaskSampleEntry1 running...
 TaskSampleEntry1 running...
+TaskSampleEntry1 running...
+TaskSampleEntry2 running...
+TaskSampleEntry1 running...
+TaskSampleEntry1 running...
+~~~
+
+在新的evalsoc上运行, 需要手动修改下 ECLIC 和 SysTimer 的基地址，如下所示
+
+~~~diff
+diff --git a/targets/riscv_nuclei_demo_soc_gcc/SoC/demosoc/Common/Include/demosoc.h b/targets/riscv_nuclei_demo_soc_gcc/SoC/demosoc/Common/Include/demosoc.h
+index d1268d0..2bc590d 100644
+--- a/targets/riscv_nuclei_demo_soc_gcc/SoC/demosoc/Common/Include/demosoc.h
++++ b/targets/riscv_nuclei_demo_soc_gcc/SoC/demosoc/Common/Include/demosoc.h
+@@ -159,12 +159,12 @@ typedef enum EXCn {
+
+ /* ToDo: define the correct core features for the demosoc */
+ #define __ECLIC_PRESENT           1                     /*!< Set to 1 if ECLIC is present */
+-#define __ECLIC_BASEADDR          0x0C000000UL          /*!< Set to ECLIC baseaddr of your device */
++#define __ECLIC_BASEADDR          0x18020000UL          /*!< Set to ECLIC baseaddr of your device */
+
+ //#define __ECLIC_INTCTLBITS        3                     /*!< Set to 1 - 8, the number of hardware bits are actually implemented in the clicintctl registers. */
+ #define __ECLIC_INTNUM            51                    /*!< Set to 1 - 1024, total interrupt number of ECLIC Unit */
+ #define __SYSTIMER_PRESENT        1                     /*!< Set to 1 if System Timer is present */
+-#define __SYSTIMER_BASEADDR       0x02000000UL          /*!< Set to SysTimer baseaddr of your device */
++#define __SYSTIMER_BASEADDR       0x18030000UL          /*!< Set to SysTimer baseaddr of your device */
+~~~
+
+修改完毕后，才可以重新编译，然后下载到开发板上运行，也可以在修正版本的qemu上运行，下载链接 https://drive.weixin.qq.com/s?k=ABcAKgdSAFchHwEAaD
+
+~~~shell
+$ qemu-system-riscv32 --version
+QEMU emulator version 9.0.4 (v9.0.4-96-gfca572fde0)
+Copyright (c) 2003-2024 Fabrice Bellard and the QEMU Project developers
+$ qemu-system-riscv32 -M nuclei_evalsoc,download=ilm -cpu nuclei-n300fd,ext= -smp 1 -icount shift=0 -nodefaults -nographic -serial stdio -kernel build/Nuclei-demo-soc.elf
+Nuclei SDK Build Time: Jul  3 2025, 15:14:54
+Download Mode: ILM
+CPU Frequency 999997767 Hz
+entering kernel init...
+Entering scheduler
 TaskSampleEntry1 running...
 TaskSampleEntry2 running...
 TaskSampleEntry1 running...

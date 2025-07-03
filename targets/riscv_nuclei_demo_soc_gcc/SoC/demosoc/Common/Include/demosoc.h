@@ -159,12 +159,12 @@ typedef enum EXCn {
 
 /* ToDo: define the correct core features for the demosoc */
 #define __ECLIC_PRESENT           1                     /*!< Set to 1 if ECLIC is present */
-#define __ECLIC_BASEADDR          0x0C000000UL          /*!< Set to ECLIC baseaddr of your device */
+#define __ECLIC_BASEADDR          0x18020000UL          /*!< Set to ECLIC baseaddr of your device */
 
 //#define __ECLIC_INTCTLBITS        3                     /*!< Set to 1 - 8, the number of hardware bits are actually implemented in the clicintctl registers. */
 #define __ECLIC_INTNUM            51                    /*!< Set to 1 - 1024, total interrupt number of ECLIC Unit */
 #define __SYSTIMER_PRESENT        1                     /*!< Set to 1 if System Timer is present */
-#define __SYSTIMER_BASEADDR       0x02000000UL          /*!< Set to SysTimer baseaddr of your device */
+#define __SYSTIMER_BASEADDR       0x18030000UL          /*!< Set to SysTimer baseaddr of your device */
 
 /*!< Set to 0, 1, or 2, 0 not present, 1 single floating point unit present, 2 double floating point unit present */
 #if !defined(__riscv_flen)

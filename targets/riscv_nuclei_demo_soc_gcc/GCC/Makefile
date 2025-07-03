@@ -49,7 +49,7 @@ $(wildcard ../SoC/demosoc/Common/Source/GCC/*.S)
 #######################################
 # binaries
 #######################################
-PREFIX = riscv-nuclei-elf-
+PREFIX = riscv64-unknown-elf-
 # The gcc compiler bin path can be either defined in make command via NUCLEI_TOOL_ROOT variable (> make NUCLEI_TOOL_ROOT=xxx)
 # either it can be added to the PATH environment variable.
 NUCLEI_RISCV_GCC_ROOT ?= $(NUCLEI_TOOL_ROOT)/gcc
