@@ -4,7 +4,8 @@
 
 > [!NOTE]
 >
-> 这个是用来测试比较早的Nuclei Demosoc FPGA环境，现在已经升级到Nuclei Evalsoc，可能编译出来的版本不能直接在开发板上跑起来，需要比较老的bitstream。
+> - **弃用** 这个是用来测试比较早的Nuclei Demosoc FPGA环境，现在已经升级到Nuclei Evalsoc，可能编译出来的版本不能直接在开发板上跑起来，需要比较老的bitstream。
+> - **注意** 最新的Nuclei EvalSoC的支持，请参见 [riscv_nuclei_evalsoc_gcc](../riscv_nuclei_evalsoc_gcc) 所在目录的文档
 
 Nuclei DDR200T开发板是一款集成了FPGA和通用MCU的RISC-V评估开发板。其中FPGA子系统采用Xilinx XC7A200T-2 FPGA芯片，提供板载FPGA JTAG下载器、丰富的板载存储（Flash,DDR,eMMC,EEPROM)、丰富的接口资源（数字、模拟）以及蜂鸟调试器接口。MCU子系统采用GD32VF103 MCU芯片，提供板载调试器以及JTAG调试接口。
 
