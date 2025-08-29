@@ -78,6 +78,8 @@ typedef struct {
     STACK_TYPE t4;         /* x29 - t4     - temporary register 4                */
     STACK_TYPE t5;         /* x30 - t5     - temporary register 5                */
     STACK_TYPE t6;         /* x31 - t6     - temporary register 6                */
+    STACK_TYPE rsv0;       /* reserved 0   - reserved to make space              */
+    STACK_TYPE rsv1;       /* reserved 1   - reserved to make space              */
 #endif
     STACK_TYPE mstatus;    /*              - machine status register             */
 } TaskContext;
